@@ -12,10 +12,11 @@ struct Node{
 };
 
 template<typename T>
-struct MyStack{
+struct MyQueue{
     Node<T>* head;
+    Node<T>* tail;
     
-    void destroy_stack(Node<T>* head){
+    void destroy_queue(Node<T>* head){
         while (head){
             Node<T>* delNode = head;
             head = head -> next;
@@ -23,34 +24,36 @@ struct MyStack{
         }
     }
     
-    ~MyStack(){
-        destroy_stack(head);
+    ~MyQueue(){
+        destroy_queue(head);
     }
 };
 
 template<typename T>
-void create_stack(MyStack<T>& st, T beginkey){
-    st.head = new Node<T>{beginkey, nullptr};
+void create_stack(MyQueue<T>& q, T beginkey){
+    q.head = new Node<T>{beginkey, nullptr};
+    q.tail = q.head;
 }
 
 template<typename T>   // O(1)
-void push(MyStack<T>& st, T key){
+void push(MyQueue<T>& q, T key){
     Node<T>* newNode = new Node<T>;
     newNode -> key = key;
-    newNode -> next = st.head;
-    st.head = newNode;
+    q.tail -> next = newNode;
+    newNode -> next = nullptr;
+    q.tail = newNode;
 }
 
 template<typename T>  // O(1)
-void pop(MyStack<T>& st){
-    Node<T>* delNode = st.head;
-    st.head = st.head -> next;
+void pop(MyQueue<T>& q){
+    Node<T>* delNode = q.head;
+    q.head = q.head -> next;
     delete delNode;
 }
 
 template<typename T>
-void print(const MyStack<T>& st) {
-    Node<T>* ptr = st.head;
+void print(const MyQueue<T>& q) {
+    Node<T>* ptr = q.head;
     while (ptr) {
         cout << ptr -> key << " ";
         ptr = ptr -> next;
@@ -59,6 +62,11 @@ void print(const MyStack<T>& st) {
 }
 
 template<typename T>   // O(1)
-T get_head(const MyStack<T>& st){
-    return st.head -> key;
+T get_head(const MyQueue<T>& q){
+    return q.head -> key;
+}
+
+template<typename T>
+void get_tail(const MyQueue<T>& q){
+    return q.tail -> key;
 }

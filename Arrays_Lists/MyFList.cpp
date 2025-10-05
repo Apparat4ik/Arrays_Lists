@@ -7,137 +7,13 @@ struct Node {
     T key;
     Node* next;
     Node() : key(NULL), next(nullptr){}
-    Node(int value, Node* ptr) : key(value), next(ptr){}
+    Node(T value, Node* ptr) : key(value), next(ptr){}
 };
 
 template<typename T>
 struct ForwardList {
-    Node<T>* head = new Node<T>{NULL, nullptr};
+    Node<T>* head;
     int size = 0;
-    
-    Node<T>* get(int key){        // O(N)
-        Node<T>* target = head;
-        while (target -> key != key){
-            target = target -> next;
-        }
-        return target;
-    }
-    
-    Node<T>* get_index(int index){
-        Node<T>* ptr = head;
-        for (int i = 0; i < index; i++){
-            ptr = ptr -> next;
-        }
-        return ptr;
-    }
-    
-    void add_next_node(int index, int key){    // O(N)
-        Node<T>* ptr = get_index(index);
-        Node<T>* newNode = new Node<T>;
-        newNode -> key = key;
-        newNode -> next = ptr -> next;
-        ptr -> next = newNode;
-        size++;
-    }
-    
-    void add_prev_node(int index, int key){
-        Node<T>* nextNode = head;
-        Node<T>* prevNode;
-        Node<T>* newNode = new Node<T>;
-        for(int i = 0; i < index; i++){
-            prevNode = nextNode;
-            nextNode = nextNode -> next;
-        }
-        newNode -> key = key;
-        prevNode -> next = newNode;
-        newNode -> next = nextNode;
-        size++;
-    }
-    
-    void add_front(int key){        // O(1)
-        Node<T>* newNode = new Node<T>;
-        newNode -> key = key;
-        newNode -> next = head -> next;
-        head -> next = newNode;
-        size++;
-    }
-    
-    void add_back(int key){       // O(N)
-        Node<T>* ptr = head;
-        for (int i = 0; i < size; i++){
-            ptr = ptr -> next;
-        }
-        Node<T>* newNode = new Node<T>;
-        newNode -> key = key;
-        newNode -> next = nullptr;
-        ptr -> next = newNode;
-        size++;
-    }
-
-    void create_FL(int keyBegin){
-        head = new Node<T>{keyBegin, nullptr};
-    }
-
-    void delete_next_elem(int index){     // O(N)
-        Node<T>* ptr = get_index(index);
-        Node<T>* deleteNode = ptr -> next;
-        ptr -> next = deleteNode -> next;
-        delete deleteNode;
-        size--;
-    }
-    
-    void delete_prev_elem(int index){
-        Node<T>* nextNode = head;
-        Node<T>* prevNode;
-        for(int i = 0; i < index - 1; i++){
-            prevNode = nextNode;
-            nextNode = nextNode -> next;
-        }
-        prevNode -> next = nextNode -> next;
-        size--;
-        delete nextNode;
-    }
-    
-    void delete_front(){              // O(1)
-        Node<T>* deleteNode = head;
-        head = head -> next;
-        delete deleteNode;
-        size--;
-    }
-    
-    void delete_back(){       // O(N)
-        Node<T>* ptr = head;
-        for (int i = 0; i < size - 1; i++){
-            ptr = ptr -> next;
-        }
-        Node<T>* deleteNode = ptr -> next;
-        ptr -> next = nullptr;
-        delete deleteNode;
-        size--;
-    }
-    
-    
-    
-    void delete_val(int key){      // O(N)
-        Node<T>* delNode = head;
-        Node<T>* prevNode;
-        while (delNode -> key != key){
-            prevNode = delNode;
-            delNode = delNode -> next;
-        }
-        prevNode -> next = delNode -> next;
-        delete delNode;
-        size--;
-    }
-    
-    void print() {
-        Node<T>* ptr = head;
-        while (ptr) {
-            cout << ptr -> key << " ";
-            ptr = ptr -> next;
-        }
-        cout << endl;
-    }
     
     void destroy_list(Node<T>* head){
         size++;
@@ -154,18 +30,162 @@ struct ForwardList {
     }
 };
 
-
-int main(){
-    ForwardList<int> fl;
-    fl.create_FL(1);
-    fl.add_back(2);
-    fl.add_back(3);
-    fl.add_next_node(0, 8);
-    fl.delete_val(8);
-    fl.add_prev_node(1, 9);
-    fl.delete_prev_elem(2);
-    fl.print();
-    return 0;
+template<typename T>
+Node<T>* get(ForwardList<T>& fl, T key){        // O(N)
+    Node<T>* target = fl.head;
+    while (target -> key != fl.key){
+        target = target -> next;
+    }
+    return target;
 }
 
+template<typename T>
+Node<T>* get_index(ForwardList<T>& fl,int index){   // O(N)
+    Node<T>* ptr = fl.head;
+    if (index >= fl.size){
+        throw out_of_range("forward list index out of bounds");
+    }
+    for (int i = 0; i < index; i++){
+        ptr = ptr -> next;
+    }
+    return ptr;
+}
 
+template<typename T>
+void get_key(ForwardList<T>& fl, int index){
+    try{
+        return get_index(fl, index) -> key;
+    }
+    catch(exception& error){
+        cerr << error.what() << endl;
+    }
+}
+
+template<typename T>
+void add_next_node(ForwardList<T>& fl, int index, T key){    // O(1)
+    try{
+        Node<T>* ptr = get_index(fl, index);
+        Node<T>* newNode = new Node<T>;
+        newNode -> key = key;
+        newNode -> next = ptr -> next;
+        ptr -> next = newNode;
+        fl.size++;
+    } catch(exception& error){
+        cerr << error.what() << endl;
+    }
+}
+
+template<typename T>
+void add_prev_node(ForwardList<T>& fl,int index, T key){    // O(1)
+    Node<T>* nextNode = fl.head;
+    Node<T>* prevNode;
+    Node<T>* newNode = new Node<T>;
+    for(int i = 0; i < index; i++){
+        prevNode = nextNode;
+        nextNode = nextNode -> next;
+    }
+    newNode -> key = key;
+    prevNode -> next = newNode;
+    newNode -> next = nextNode;
+    fl.size++;
+}
+
+template<typename T>
+void add_front(ForwardList<T>& fl, T key){        // O(1)
+    Node<T>* newNode = new Node<T>;
+    newNode -> key = key;
+    newNode -> next = fl.head -> next;
+    fl.head -> next = newNode;
+    fl.size++;
+}
+
+template<typename T>
+void add_back(ForwardList<T>& fl,T key){       // O(N)
+    Node<T>* ptr = fl.head;
+    while(ptr -> next){
+        ptr = ptr -> next;
+    }
+    Node<T>* newNode = new Node<T>;
+    newNode -> key = key;
+    newNode -> next = nullptr;
+    ptr -> next = newNode;
+    fl.size++;
+}
+
+template<typename T>
+void create_FL(ForwardList<T>& fl, T keyBegin){
+    fl.head = new Node<T>{keyBegin, nullptr};
+}
+
+template<typename T>
+void delete_next_elem(ForwardList<T>& fl, int index){     // O(N)
+    try{
+        Node<T>* ptr = get_index(fl, index);
+        Node<T>* deleteNode = ptr -> next;
+        ptr -> next = deleteNode -> next;
+        delete deleteNode;
+        fl.size--;
+    } catch(exception& error){
+        cerr << error.what() << endl;
+    }
+}
+
+template<typename T>
+void delete_prev_elem(ForwardList<T>& fl,int index){
+    try{
+        Node<T>* nextNode = fl.head;
+        Node<T>* prevNode;
+        for(int i = 0; i < index - 1; i++){
+            prevNode = nextNode;
+            nextNode = nextNode -> next;
+        }
+        prevNode -> next = nextNode -> next;
+        fl.size--;
+        delete nextNode;
+    } catch(exception& error){
+        cerr << error.what() << endl;
+    }
+}
+
+template<typename T>
+void delete_front(ForwardList<T>& fl){              // O(1)
+    Node<T>* deleteNode = fl.head;
+    fl.head = fl.head -> next;
+    delete deleteNode;
+    fl.size--;
+}
+
+template<typename T>
+void delete_back(ForwardList<T>& fl){       // O(N)
+    Node<T>* ptr = fl.head;
+    while (ptr -> next){
+        ptr = ptr -> next;
+    }
+    Node<T>* deleteNode = ptr -> next;
+    ptr -> next = nullptr;
+    delete deleteNode;
+    fl.size--;
+}
+
+template<typename T>
+void delete_val(ForwardList<T>& fl,T key){      // O(N)
+    Node<T>* delNode = fl.head;
+    Node<T>* prevNode;
+    while (delNode -> key != key){
+        prevNode = delNode;
+        delNode = delNode -> next;
+    }
+    prevNode -> next = delNode -> next;
+    delete delNode;
+    fl.size--;
+}
+
+template<typename T>
+void print(const ForwardList<T>& fl) {
+    Node<T>* ptr = fl.head;
+    while (ptr) {
+        cout << ptr -> key << " ";
+        ptr = ptr -> next;
+    }
+    cout << endl;
+}

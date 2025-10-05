@@ -16,11 +16,6 @@ struct MyArray {
     
     MyArray() : data(nullptr), size(0), capacity(0){}
     
-    void init_array(int initial_cap) {
-        data = (Node<T>*)malloc(initial_cap * sizeof(Node<T>));
-        capacity = initial_cap;
-    }
-    
     MyArray(const MyArray& other) {    // конструктор для копирования массива
            init_array(other.capacity);
            size = other.size;
@@ -41,76 +36,59 @@ struct MyArray {
         return *this;
     }
     
-    void add_to_back(int key) {                 // O(1)
-        if (size >= capacity){return;}
-        data[size].key = key;
-        size++;
-    }
-    
-    void destroy_array() {
-        free(data);
-    }
-    
-    void add_to_index(int index, int key){        // O(N)
-        for (int i = size - 1; i >= index; i--){
-            data[i + 1] = data[i];
-        }
-        data[index].key = key;
-        size++;
-    }
-    
-    int get(int index){             // O(1)
-        return data[index].key;
-    }
-    
-    void pop_index(int index){       // O(N)
-        for (int i = index; i < size; i++){
-            data[i] = data[i++];
-        }
-        data[size - 1].key = NULL;
-    }
-    
-    void swap(int index, int swapkey){
-        data[index].key = swapkey;
-    }
-    
-    void print(){
-        for (int i = 0; i < size; i++) {
-            cout << data[i].key << " ";
-        }
-    }
-    
-    int array_size(){
-        return size;
-    }
-    
     ~MyArray(){
-        destroy_array();
+        free(data);
     }
 };
 
+template<typename T>
+void init_array(int initial_cap, MyArray<T>& ar) {
+    data = (Node<T>*)malloc(initial_cap * sizeof(Node<T>));
+    ar.capacity = initial_cap;
+}
 
+template<typename T>
+void add_to_back(MyArray<T>& ar, T key) {                 // O(1)
+    if (size >= ar.capacity){return;}
+     
+    ar.size++;
+}
 
-/*
-int main() {
-    MyArray arr1;
-    arr1.init_array(11);
-    
-    
-    for (int i = 0; i < 10; i++) {
-        arr1.add_to_back(i * 10);
+template<typename T>
+void add_to_index(MyArray<T>& ar, int index, T key){        // O(N)
+    for (int i = ar.size - 1; i >= index; i--){
+        ar.data[i + 1] = ar.data[i];
     }
-    
-    MyArray arr2;
-    arr2.init_array(11);
-    arr2 = arr1;
-    arr1.print();
-    cout << endl;
-    arr1.add_to_index(5, 67);
-    
-    arr1.print();
-    cout << endl;
-    arr2.print();
-    
-    return 0;
-}*/
+    ar.data[index].key = key;
+    ar.size++;
+}
+
+template<typename T>
+T get(MyArray<T>& ar, int index){             // O(1)
+    return ar.data[index].key;
+}
+
+template<typename T>
+void pop_index(MyArray<T>& ar, int index){       // O(N)
+    for (int i = index; i < ar.size; i++){
+        ar.data[i] = ar.data[i++];
+    }
+    ar.data[ar.size - 1].key = NULL;
+}
+
+template<typename T>
+void swap(MyArray<T>& ar,int index, T swapkey){
+    ar.data[index].key = swapkey;
+}
+
+template<typename T>
+void print(const MyArray<T>& ar){
+    for (int i = 0; i < ar.size; i++) {
+        cout << ar.data[i].key << " ";
+    }
+}
+
+template<typename T>
+int array_size(const MyArray<T>& ar){
+    return ar.size;
+}
