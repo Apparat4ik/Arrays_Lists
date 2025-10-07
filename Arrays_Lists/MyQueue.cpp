@@ -5,7 +5,7 @@ using namespace std;
 template<typename T>
 struct Node{
     T key;
-    Node* next;
+    Node<T>* next;
     
     Node() : key(NULL), next(nullptr){}
     Node(T value, Node* ptr) : key(value), next(ptr){}
@@ -15,6 +15,8 @@ template<typename T>
 struct MyQueue{
     Node<T>* head;
     Node<T>* tail;
+    
+    MyQueue() : head(nullptr), tail(head){}
     
     void destroy_queue(Node<T>* head){
         while (head){
@@ -29,19 +31,21 @@ struct MyQueue{
     }
 };
 
-template<typename T>
-void create_stack(MyQueue<T>& q, T beginkey){
-    q.head = new Node<T>{beginkey, nullptr};
-    q.tail = q.head;
-}
 
 template<typename T>   // O(1)
 void push(MyQueue<T>& q, T key){
     Node<T>* newNode = new Node<T>;
     newNode -> key = key;
-    q.tail -> next = newNode;
-    newNode -> next = nullptr;
-    q.tail = newNode;
+    if (q.head == nullptr){
+        q.head = newNode;
+        newNode -> next = nullptr;
+        q.tail = q.head;
+    } else {
+        q.tail -> next = newNode;
+        newNode -> next = nullptr;
+        q.tail = newNode;
+    }
+    
 }
 
 template<typename T>  // O(1)
@@ -64,6 +68,12 @@ void print(const MyQueue<T>& q) {
 template<typename T>   // O(1)
 T get_head(const MyQueue<T>& q){
     return q.head -> key;
+}
+
+template<typename T>
+bool empty(const MyQueue<T>& q){
+    if (q.head == nullptr){return true;}
+    return false;
 }
 
 template<typename T>

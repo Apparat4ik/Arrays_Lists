@@ -15,6 +15,8 @@ template<typename T>
 struct MyStack{
     Node<T>* head;
     
+    MyStack() : head(nullptr){}
+    
     void destroy_stack(Node<T>* head){
         while (head){
             Node<T>* delNode = head;
@@ -28,10 +30,6 @@ struct MyStack{
     }
 };
 
-template<typename T>
-void create_stack(MyStack<T>& st, T beginkey){
-    st.head = new Node<T>{beginkey, nullptr};
-}
 
 template<typename T>   // O(1)
 void push(MyStack<T>& st, T key){

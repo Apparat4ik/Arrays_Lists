@@ -15,8 +15,9 @@ struct ForwardList {
     Node<T>* head;
     int size = 0;
     
+    ForwardList() : head(nullptr){}
+    
     void destroy_list(Node<T>* head){
-        size++;
         while (size != 0){
             Node<T>* delNode = head;
             head = head -> next;
@@ -113,11 +114,6 @@ void add_back(ForwardList<T>& fl,T key){       // O(N)
 }
 
 template<typename T>
-void create_FL(ForwardList<T>& fl, T keyBegin){
-    fl.head = new Node<T>{keyBegin, nullptr};
-}
-
-template<typename T>
 void delete_next_elem(ForwardList<T>& fl, int index){     // O(N)
     try{
         Node<T>* ptr = get_index(fl, index);
@@ -189,3 +185,4 @@ void print(const ForwardList<T>& fl) {
     }
     cout << endl;
 }
+

@@ -17,6 +17,8 @@ struct DoubleList {
     Node<T>* tail;
     int size = 0;
     
+    DoubleList() : head(nullptr), tail(head){}
+    
     void destroy_list(Node<T>* head){
         while (size != 0){
             Node<T>* delNode = head;
@@ -208,8 +210,18 @@ template<typename T>
 void print_DL(const DoubleList<T>& dl) {
     Node<T>* ptr = dl.head;
     while (ptr) {
-        cout << ptr -> key << " ";
+        cout << ptr -> key << ' ' << &(ptr -> key)<< " ";
         ptr = ptr -> right;
+    }
+    cout << endl;
+}
+
+template<typename T>
+void print_DL_reverse(const DoubleList<T>& dl) {
+    Node<T>* ptr = dl.tail;
+    while (ptr) {
+        cout << ptr -> key << " ";
+        ptr = ptr -> left;
     }
     cout << endl;
 }
