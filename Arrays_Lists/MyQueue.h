@@ -1,26 +1,26 @@
-#include <iostream>
+#pragma once
 
-using namespace std;
+#include "header.h"
 
 template<typename T>
-struct Node{
+struct QNode{
     T key;
-    Node<T>* next;
+    QNode<T>* next;
     
-    Node() : key(NULL), next(nullptr){}
-    Node(T value, Node* ptr) : key(value), next(ptr){}
+    QNode() : key(NULL), next(nullptr){}
+    QNode(T value, QNode* ptr) : key(value), next(ptr){}
 };
 
 template<typename T>
 struct MyQueue{
-    Node<T>* head;
-    Node<T>* tail;
+    QNode<T>* head;
+    QNode<T>* tail;
     
     MyQueue() : head(nullptr), tail(head){}
     
-    void destroy_queue(Node<T>* head){
+    void destroy_queue(QNode<T>* head){
         while (head){
-            Node<T>* delNode = head;
+            QNode<T>* delNode = head;
             head = head -> next;
             delete delNode;
         }
@@ -33,8 +33,8 @@ struct MyQueue{
 
 
 template<typename T>   // O(1)
-void push(MyQueue<T>& q, T key){
-    Node<T>* newNode = new Node<T>;
+void QPUSH(MyQueue<T>& q, T key){
+    QNode<T>* newNode = new QNode<T>;
     newNode -> key = key;
     if (q.head == nullptr){
         q.head = newNode;
@@ -49,15 +49,15 @@ void push(MyQueue<T>& q, T key){
 }
 
 template<typename T>  // O(1)
-void pop(MyQueue<T>& q){
-    Node<T>* delNode = q.head;
+void QPOP(MyQueue<T>& q){
+    QNode<T>* delNode = q.head;
     q.head = q.head -> next;
     delete delNode;
 }
 
 template<typename T>
-void print(const MyQueue<T>& q) {
-    Node<T>* ptr = q.head;
+void PRINT(const MyQueue<T>& q) {
+    QNode<T>* ptr = q.head;
     while (ptr) {
         cout << ptr -> key << " ";
         ptr = ptr -> next;
@@ -71,7 +71,7 @@ T get_head(const MyQueue<T>& q){
 }
 
 template<typename T>
-bool empty(const MyQueue<T>& q){
+bool QEMPTY(const MyQueue<T>& q){
     if (q.head == nullptr){return true;}
     return false;
 }

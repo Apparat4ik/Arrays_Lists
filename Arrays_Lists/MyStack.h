@@ -1,25 +1,26 @@
-#include <iostream>
+#pragma once
 
-using namespace std;
+#include "header.h"
+
 
 template<typename T>
-struct Node{
+struct StNode{
     T key;
-    Node* next;
+    StNode* next;
     
-    Node() : key(NULL), next(nullptr){}
-    Node(T value, Node* ptr) : key(value), next(ptr){}
+    StNode() : key(NULL), next(nullptr){}
+    StNode(T value, StNode* ptr) : key(value), next(ptr){}
 };
 
 template<typename T>
 struct MyStack{
-    Node<T>* head;
+    StNode<T>* head;
     
     MyStack() : head(nullptr){}
     
-    void destroy_stack(Node<T>* head){
+    void destroy_stack(StNode<T>* head){
         while (head){
-            Node<T>* delNode = head;
+            StNode<T>* delNode = head;
             head = head -> next;
             delete delNode;
         }
@@ -32,23 +33,23 @@ struct MyStack{
 
 
 template<typename T>   // O(1)
-void push(MyStack<T>& st, T key){
-    Node<T>* newNode = new Node<T>;
+void SPUSH(MyStack<T>& st, T key){
+    StNode<T>* newNode = new StNode<T>;
     newNode -> key = key;
     newNode -> next = st.head;
     st.head = newNode;
 }
 
 template<typename T>  // O(1)
-void pop(MyStack<T>& st){
-    Node<T>* delNode = st.head;
+void SPOP(MyStack<T>& st){
+    StNode<T>* delNode = st.head;
     st.head = st.head -> next;
     delete delNode;
 }
 
 template<typename T>
-void print(const MyStack<T>& st) {
-    Node<T>* ptr = st.head;
+void PRINT(const MyStack<T>& st) {
+    StNode<T>* ptr = st.head;
     while (ptr) {
         cout << ptr -> key << " ";
         ptr = ptr -> next;
@@ -57,6 +58,6 @@ void print(const MyStack<T>& st) {
 }
 
 template<typename T>   // O(1)
-T get_head(const MyStack<T>& st){
+T SGET_head(const MyStack<T>& st){
     return st.head -> key;
 }

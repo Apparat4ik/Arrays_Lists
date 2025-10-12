@@ -1,27 +1,28 @@
-#include <iostream>
+#pragma once
 
-using namespace std;
+#include "header.h"
+
 
 template<typename T>
-struct Node {
+struct DLNode {
     T key;
-    Node* left;
-    Node* right;
-    Node() : key(NULL), left(nullptr), right(nullptr){}
-    Node(T value, Node* leftptr, Node* rightptr) : key(value), left(leftptr), right(rightptr){}
+    DLNode* left;
+    DLNode* right;
+    DLNode() : key(NULL), left(nullptr), right(nullptr){}
+    DLNode(T value, DLNode* leftptr, DLNode* rightptr) : key(value), left(leftptr), right(rightptr){}
 };
 
 template<typename T>
 struct DoubleList {
-    Node<T>* head;
-    Node<T>* tail;
+    DLNode<T>* head;
+    DLNode<T>* tail;
     int size = 0;
     
     DoubleList() : head(nullptr), tail(head){}
     
-    void destroy_list(Node<T>* head){
+    void destroy_list(DLNode<T>* head){
         while (size != 0){
-            Node<T>* delNode = head;
+            DLNode<T>* delNode = head;
             head = head -> right;
             size--;
             delete delNode;
@@ -32,6 +33,7 @@ struct DoubleList {
         destroy_list(head);
     }
 };
+
 
 template<typename T>
 void size_check(DoubleList<T>& dl){
@@ -44,17 +46,20 @@ void size_check(DoubleList<T>& dl){
 }
 
 template<typename T>
-Node<T>* get(DoubleList<T>& dl, T key){        // O(N)
-    Node<T>* target = dl.head;
+DLNode<T>* LGET(DoubleList<T>& dl, T key){        // O(N)
+    DLNode<T>* target = dl.head;
     while (target -> key != dl.key){
         target = target -> right;
+    }
+    if (target == nullptr){
+        throw invalid_argument("There is no element");
     }
     return target;
 }
 
 template<typename T>
-Node<T>* get_index(DoubleList<T>& dl,int index){
-    Node<T>* ptr;
+DLNode<T>* LGET_index(DoubleList<T>& dl,int index){
+    DLNode<T>* ptr;
     
     if (index > dl.size / 2){
         ptr = dl.tail;
@@ -73,16 +78,16 @@ Node<T>* get_index(DoubleList<T>& dl,int index){
 }
 
 template<typename T>
-void get_key(DoubleList<T>& dl, int index){
+void LGEt_key(DoubleList<T>& dl, int index){
     return get_index(dl, index) -> key;
 }
 
 
 template<typename T>
-void add_next_node(DoubleList<T>& dl, int index, T key){    // O(1)
+void LPUSH_next(DoubleList<T>& dl, int index, T key){    // O(1)
     try{
-        Node<T>* ptr = get_index(dl, index);
-        Node<T>* newNode = new Node<T>;
+        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
         newNode -> right = ptr -> right;
         ptr -> right -> left = newNode;
@@ -96,10 +101,10 @@ void add_next_node(DoubleList<T>& dl, int index, T key){    // O(1)
 }
 
 template<typename T>
-void add_prev_node(DoubleList<T>& dl,int index, T key){   // O(1)
+void LPUSH_prev(DoubleList<T>& dl,int index, T key){   // O(1)
     try{
-        Node<T>* ptr = get_index(dl, index);
-        Node<T>* newNode = new Node<T>;
+        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
         newNode -> right = ptr;
         ptr -> left -> right = newNode;
@@ -113,8 +118,8 @@ void add_prev_node(DoubleList<T>& dl,int index, T key){   // O(1)
 }
 
 template<typename T>
-void add_front(DoubleList<T>& dl, T key){        // O(1)
-    Node<T>* newNode = new Node<T>;
+void LPUSH_front(DoubleList<T>& dl, T key){        // O(1)
+    DLNode<T>* newNode = new DLNode<T>;
     newNode -> key = key;
     newNode -> right = dl.head;
     dl.head -> left = newNode;
@@ -125,8 +130,8 @@ void add_front(DoubleList<T>& dl, T key){        // O(1)
 }
 
 template<typename T>
-void add_back(DoubleList<T>& dl,T key){       // O(1)
-    Node<T>* newNode = new Node<T>;
+void LPUSH_back(DoubleList<T>& dl,T key){       // O(1)
+    DLNode<T>* newNode = new DLNode<T>;
     newNode -> key = key;
     newNode -> right = nullptr;
     dl.tail -> right = newNode;
@@ -137,17 +142,10 @@ void add_back(DoubleList<T>& dl,T key){       // O(1)
 }
 
 template<typename T>
-void create_DL(DoubleList<T>& dl, T keyBegin){
-    dl.head = new Node<T>{keyBegin, nullptr, nullptr};
-    dl.tail = dl.head;
-    dl.size++;
-}
-
-template<typename T>
-void delete_next_elem(DoubleList<T>& dl, int index){     // O(1)
+void LDEL_next(DoubleList<T>& dl, int index){     // O(1)
     try{
-        Node<T>* ptr = get_index(dl, index);
-        Node<T>* deleteNode = ptr -> right;
+        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* deleteNode = ptr -> right;
         ptr -> right = deleteNode -> right;
         ptr -> right -> left = ptr;
         delete deleteNode;
@@ -159,10 +157,10 @@ void delete_next_elem(DoubleList<T>& dl, int index){     // O(1)
 }
 
 template<typename T>
-void delete_prev_elem(DoubleList<T>& dl, int index){   //O(1)
+void LDEL_prev(DoubleList<T>& dl, int index){   //O(1)
     try{
-        Node<T>* ptr = get_index(dl, index);
-        Node<T>* deleteNode = ptr -> left;
+        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* deleteNode = ptr -> left;
         deleteNode -> left -> right = ptr;
         ptr -> left = deleteNode -> left;
         dl.size--;
@@ -174,8 +172,8 @@ void delete_prev_elem(DoubleList<T>& dl, int index){   //O(1)
 }
 
 template<typename T>
-void delete_front(DoubleList<T>& dl){              // O(1)
-    Node<T>* deleteNode = dl.head;
+void LDEL_front(DoubleList<T>& dl){              // O(1)
+    DLNode<T>* deleteNode = dl.head;
     dl.head = dl.head -> right;
     dl.head -> left = nullptr;
     delete deleteNode;
@@ -184,8 +182,8 @@ void delete_front(DoubleList<T>& dl){              // O(1)
 }
 
 template<typename T>
-void delete_back(DoubleList<T>& dl){       // O(N)
-    Node<T>* deleteNode = dl.tail;
+void LDEL_back(DoubleList<T>& dl){       // O(N)
+    DLNode<T>* deleteNode = dl.tail;
     dl.tail = dl.tail -> left;
     dl.tail -> right = nullptr;
     delete deleteNode;
@@ -194,8 +192,8 @@ void delete_back(DoubleList<T>& dl){       // O(N)
 }
 
 template<typename T>
-void delete_val(DoubleList<T>& dl, T key){      // O(N)
-    Node<T>* deleteNode = dl.head;
+void LDEL_val(DoubleList<T>& dl, T key){      // O(N)
+    DLNode<T>* deleteNode = dl.head;
     while (deleteNode -> key != key){
         deleteNode = deleteNode -> right;
     }
@@ -207,8 +205,8 @@ void delete_val(DoubleList<T>& dl, T key){      // O(N)
 }
 
 template<typename T>
-void print_DL(const DoubleList<T>& dl) {
-    Node<T>* ptr = dl.head;
+void PRINT(const DoubleList<T>& dl) {
+    DLNode<T>* ptr = dl.head;
     while (ptr) {
         cout << ptr -> key << ' ' << &(ptr -> key)<< " ";
         ptr = ptr -> right;
@@ -217,8 +215,8 @@ void print_DL(const DoubleList<T>& dl) {
 }
 
 template<typename T>
-void print_DL_reverse(const DoubleList<T>& dl) {
-    Node<T>* ptr = dl.tail;
+void PRINT_reverse_dl(const DoubleList<T>& dl) {
+    DLNode<T>* ptr = dl.tail;
     while (ptr) {
         cout << ptr -> key << " ";
         ptr = ptr -> left;

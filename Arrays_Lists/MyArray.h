@@ -1,17 +1,17 @@
-#include <iostream>
+#pragma once
+
+#include "header.h"
 #include <cstdlib>
 
-using namespace std;
-
 template<typename T>
-struct Node {
+struct ArNode {
     T key;
 };
 
 template<typename T>
 struct MyArray {
-    Node<T>* data;
-    int size;
+    ArNode<T>* data;
+    int size = 0;
     int capacity;
     
     MyArray() : data(nullptr), size(0), capacity(0){}
@@ -36,26 +36,30 @@ struct MyArray {
         return *this;
     }
     
+    MyArray(int init_cap){
+        data = (ArNode<T>*)malloc(init_cap * sizeof(ArNode<T>));
+        capacity = init_cap;
+    }
+    
     ~MyArray(){
         free(data);
     }
 };
 
-template<typename T>
-void init_array(int initial_cap, MyArray<T>& ar) {
-    data = (Node<T>*)malloc(initial_cap * sizeof(Node<T>));
-    ar.capacity = initial_cap;
-}
 
 template<typename T>
-void add_to_back(MyArray<T>& ar, T key) {                 // O(1)
-    if (size >= ar.capacity){return;}
-     
+void MPUSH_back(MyArray<T>& ar, T key) {                 // O(1)
+    if (ar.size >= ar.capacity){return;}
+    ar.data[ar.size].key = key;
     ar.size++;
 }
 
 template<typename T>
-void add_to_index(MyArray<T>& ar, int index, T key){        // O(N)
+void MPUSH_index(MyArray<T>& ar, int index, T key){        // O(N)
+    if (index >= ar.size || index < 0){
+        throw invalid_argument("Array index out od bounds");
+    }
+    
     for (int i = ar.size - 1; i >= index; i--){
         ar.data[i + 1] = ar.data[i];
     }
@@ -64,12 +68,18 @@ void add_to_index(MyArray<T>& ar, int index, T key){        // O(N)
 }
 
 template<typename T>
-T get(MyArray<T>& ar, int index){             // O(1)
+T MGET(MyArray<T>& ar, int index){             // O(1)
+    if (index >= ar.size || index < 0){
+        throw invalid_argument("Array index out od bounds");
+    }
     return ar.data[index].key;
 }
 
 template<typename T>
-void pop_index(MyArray<T>& ar, int index){       // O(N)
+void MDEL(MyArray<T>& ar, int index){       // O(N)
+    if (index >= ar.size || index < 0){
+        throw invalid_argument("Array index out od bounds");
+    }
     for (int i = index; i < ar.size; i++){
         ar.data[i] = ar.data[i++];
     }
@@ -77,18 +87,21 @@ void pop_index(MyArray<T>& ar, int index){       // O(N)
 }
 
 template<typename T>
-void swap(MyArray<T>& ar,int index, T swapkey){
+void MSWAP(MyArray<T>& ar,int index, T swapkey){
+    if (index >= ar.size || index < 0){
+        throw invalid_argument("Array index out od bounds");
+    }
     ar.data[index].key = swapkey;
 }
 
 template<typename T>
-void print(const MyArray<T>& ar){
+void PRINT(const MyArray<T>& ar){
     for (int i = 0; i < ar.size; i++) {
         cout << ar.data[i].key << " ";
     }
 }
 
 template<typename T>
-int array_size(const MyArray<T>& ar){
+int MSIZE(const MyArray<T>& ar){
     return ar.size;
 }

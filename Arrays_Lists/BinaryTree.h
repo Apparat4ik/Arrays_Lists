@@ -1,7 +1,7 @@
-#include <iostream>
-#include "MyQueue.cpp"
+#pragma once
 
-using namespace std;
+#include "header.h"
+#include "MyQueue.cpp"
 
 template<typename T>
 struct TreeNode{
@@ -43,13 +43,13 @@ bool preorder_search(const TreeNode<T>& root, T key){  // прямой обхо�
 }
 
 template<typename T>
-bool is_member(const FBTree<T>& tree, T key){   // поиск элементач
+bool TISMEMBER(const FBTree<T>& tree, T key){   // поиск элементач
     return preorder_search(tree.root, key);
 }
 
 
 template<typename T>
-void insert(FBTree<T>& tree, T key){
+void TINSERT(FBTree<T>& tree, T key){
     TreeNode<T>* newNode = new TreeNode<T>{key, nullptr, nullptr};
     if (tree.root == nullptr) {
         tree.root = newNode;
@@ -57,25 +57,25 @@ void insert(FBTree<T>& tree, T key){
     }
 
     MyQueue<TreeNode<T>*> q;
-    push(q, tree.root);
+    QPUSH(q, tree.root);
 
-    while (!empty(q)) {
+    while (!QEMPTY(q)) {
         TreeNode<T>* current = get_head(q);
-        pop(q);
+        QPOP(q);
 
         if (current->left == nullptr) {
             current->left = newNode;
             return;
         }
         else {
-            push(q, current->left);
+            QPUSH(q, current->left);
         }
         if (current->right == nullptr) {
             current->right = newNode;
             return;
         }
         else {
-            push(q, current->right);
+            QPUSH(q, current->right);
         }
     }
 }
@@ -121,67 +121,43 @@ void post_order(const TreeNode<T>* root){  // обратный обход
 }
 
 template<typename T>
-void print_preorder(FBTree<T>& tree){
+void PRINT_preorder(FBTree<T>& tree){
     pre_order(tree.root);
     cout << endl;
 }
 
 template<typename T>
-void print_inorder(FBTree<T>& tree){
+void PRINT_inorder(FBTree<T>& tree){
     in_order(tree.root);
     cout << endl;
 }
 
 template<typename T>
-void print_postorder(FBTree<T>& tree){
+void PRINT_postorder(FBTree<T>& tree){
     post_order(tree.root);
     cout << endl;
 }
 
 template<typename T>
-void print_BFS(const FBTree<T>& tree){    // вывод через обход в ширину
+void PRINT(const FBTree<T>& tree){    // вывод через обход в ширину (BFS)
     if (tree.root == nullptr){
         throw out_of_range("Tree is empty");
     }
     
     MyQueue<TreeNode<T>*> q;
-    push(q, tree.root);
+    QPUSH(q, tree.root);
     
-    while (!empty(q)) {
+    while (!QEMPTY(q)) {
         TreeNode<T>* current = get_head(q);
-        pop(q);
+        QPOP(q);
         
         cout << current -> key << ' ';
         if (current -> left != nullptr){
-            push(q, current -> left);
+            QPUSH(q, current -> left);
         }
         if (current -> right != nullptr){
-            push(q, current -> right);
+            QPUSH(q, current -> right);
         }
     }
     cout << endl;
-}
-
-
-
-int main(){
-    FBTree<int> tree;
-    insert(tree, 1);
-    insert(tree, 2);
-    print_BFS(tree);
-    cout << is_fullbinary(tree.root) << endl;
-    insert(tree, 3);
-    
-    cout << is_fullbinary(tree.root) << endl;
-    insert(tree, 4);
-    insert(tree, 5);
-    insert(tree, 6);
-    insert(tree, 7);
-    print_preorder(tree);
-    print_inorder(tree);
-    print_postorder(tree);
-    cout << is_fullbinary(tree.root) << endl;
-    insert(tree, 8);
-    cout << is_fullbinary(tree.root) << endl;
-    return 0;
 }
