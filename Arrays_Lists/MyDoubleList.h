@@ -8,7 +8,7 @@ struct DLNode {
     T key;
     DLNode* left;
     DLNode* right;
-    DLNode() : key(NULL), left(nullptr), right(nullptr){}
+    DLNode() : key(T()), left(nullptr), right(nullptr){}
     DLNode(T value, DLNode* leftptr, DLNode* rightptr) : key(value), left(leftptr), right(rightptr){}
 };
 
@@ -21,12 +21,13 @@ struct DoubleList {
     DoubleList() : head(nullptr), tail(head){}
     
     void destroy_list(DLNode<T>* head){
-        while (size != 0){
-            DLNode<T>* delNode = head;
-            head = head -> right;
-            size--;
-            delete delNode;
+        DLNode<T>* current = head;
+        while (current != nullptr) {
+            DLNode<T>* next = current->right;
+            delete current;
+            current = next;
         }
+        size = 0;
     }
     
     ~DoubleList(){
@@ -48,7 +49,7 @@ void size_check(DoubleList<T>& dl){
 template<typename T>
 DLNode<T>* LGET(DoubleList<T>& dl, T key){        // O(N)
     DLNode<T>* target = dl.head;
-    while (target -> key != dl.key){
+    while (target -> key != key){
         target = target -> right;
     }
     if (target == nullptr){
@@ -58,7 +59,7 @@ DLNode<T>* LGET(DoubleList<T>& dl, T key){        // O(N)
 }
 
 template<typename T>
-DLNode<T>* LGET_index(DoubleList<T>& dl,int index){
+DLNode<T>* LGET_index(DoubleList<T>& dl, int index){
     DLNode<T>* ptr;
     
     if (index > dl.size / 2){
@@ -78,15 +79,15 @@ DLNode<T>* LGET_index(DoubleList<T>& dl,int index){
 }
 
 template<typename T>
-void LGEt_key(DoubleList<T>& dl, int index){
-    return get_index(dl, index) -> key;
+T LGET_key(DoubleList<T>& dl, int index){
+    return LGET_index(dl, index) -> key;
 }
 
 
 template<typename T>
 void LPUSH_next(DoubleList<T>& dl, int index, T key){    // O(1)
     try{
-        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
         newNode -> right = ptr -> right;
@@ -103,7 +104,7 @@ void LPUSH_next(DoubleList<T>& dl, int index, T key){    // O(1)
 template<typename T>
 void LPUSH_prev(DoubleList<T>& dl,int index, T key){   // O(1)
     try{
-        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
         newNode -> right = ptr;
@@ -132,6 +133,11 @@ void LPUSH_front(DoubleList<T>& dl, T key){        // O(1)
 template<typename T>
 void LPUSH_back(DoubleList<T>& dl,T key){       // O(1)
     DLNode<T>* newNode = new DLNode<T>;
+    if (dl.head == nullptr){
+        dl.head = newNode;
+        dl.tail = dl.head;
+    }
+    
     newNode -> key = key;
     newNode -> right = nullptr;
     dl.tail -> right = newNode;
@@ -144,7 +150,7 @@ void LPUSH_back(DoubleList<T>& dl,T key){       // O(1)
 template<typename T>
 void LDEL_next(DoubleList<T>& dl, int index){     // O(1)
     try{
-        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* deleteNode = ptr -> right;
         ptr -> right = deleteNode -> right;
         ptr -> right -> left = ptr;
@@ -159,7 +165,7 @@ void LDEL_next(DoubleList<T>& dl, int index){     // O(1)
 template<typename T>
 void LDEL_prev(DoubleList<T>& dl, int index){   //O(1)
     try{
-        DLNode<T>* ptr = get_index(dl, index);
+        DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* deleteNode = ptr -> left;
         deleteNode -> left -> right = ptr;
         ptr -> left = deleteNode -> left;
@@ -222,5 +228,36 @@ void PRINT_reverse_dl(const DoubleList<T>& dl) {
         ptr = ptr -> left;
     }
     cout << endl;
+}
+
+template<typename T>
+void dlist_write_file(const DoubleList<T>& dl, const string& filename){   // запись списка в файл
+    ofstream file(filename);
+    if (file.is_open()){
+        file << dl.size << ' ';
+        DLNode<T>* current = dl.head;
+        while (current) {
+            file << current -> key << ' ';
+            current = current -> right;
+        }
+    }
+    file.close();
+}
+
+template<typename T>
+void dlist_read_file(DoubleList<T>& dl, const string& filename){   // чтение из файла
+    dl.destroy_list(dl.head);
+    ifstream file(filename);
+    if (is_file_empty(filename)){return;}
+    dl = DoubleList<T>();
+    
+    int listsize;
+    file >> listsize;
+    for (int i = 0; i < listsize; i++) {
+        T data;
+        file >> data;
+        LPUSH_back(dl, data);
+    }
+    file.close();
 }
 

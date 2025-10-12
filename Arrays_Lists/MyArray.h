@@ -17,24 +17,24 @@ struct MyArray {
     MyArray() : data(nullptr), size(0), capacity(0){}
     
     MyArray(const MyArray& other) {    // конструктор для копирования массива
-           init_array(other.capacity);
+           data = (ArNode<T>*)malloc(other.capacity * sizeof(ArNode<T>));
            size = other.size;
            for (int i = 0; i < size; i++) {
                data[i] = other.data[i];
            }
     }
-       
+    /*
     MyArray& operator=(const MyArray& other) {  // перешрузка оператора присваивания
         if (this != &other) {
             free(data);
-            init_array(other.capacity);
+            data = (ArNode<T>*)malloc(other.capacity * sizeof(ArNode<T>));
             size = other.size;
             for (int i = 0; i < size; i++) {
                 data[i] = other.data[i];
             }
         }
         return *this;
-    }
+    }*/
     
     MyArray(int init_cap){
         data = (ArNode<T>*)malloc(init_cap * sizeof(ArNode<T>));
@@ -80,10 +80,11 @@ void MDEL(MyArray<T>& ar, int index){       // O(N)
     if (index >= ar.size || index < 0){
         throw invalid_argument("Array index out od bounds");
     }
-    for (int i = index; i < ar.size; i++){
-        ar.data[i] = ar.data[i++];
+    for (int i = index; i < ar.size - 1; i++){
+        ar.data[i] = ar.data[i + 1];
     }
-    ar.data[ar.size - 1].key = NULL;
+    ar.data[ar.size - 1].key = T();
+    ar.size--;
 }
 
 template<typename T>
@@ -99,9 +100,41 @@ void PRINT(const MyArray<T>& ar){
     for (int i = 0; i < ar.size; i++) {
         cout << ar.data[i].key << " ";
     }
+    cout << endl;
 }
 
 template<typename T>
 int MSIZE(const MyArray<T>& ar){
     return ar.size;
+}
+
+template<typename T>
+void array_write_file(const MyArray<T>& ar, const string& filename){   // запись массива в файл
+    ofstream file(filename);
+    if (file.is_open()){
+        file << ar.size << ' ';
+        for (int i = 0; i < ar.size; i++){
+            file << ar.data[i].key << ' ';
+        }
+    }
+    file.close();
+}
+
+template<typename T>
+void array_read_file(MyArray<T>& ar, const string& filename){   // чтение из файла
+    free(ar.data);
+    ar.size = 0;
+    ar.data = (ArNode<T>*)malloc(ar.capacity * sizeof(ArNode<T>));
+    ifstream file(filename);
+    
+    if (is_file_empty(filename)){return;}
+    
+    int listsize;
+    file >> listsize;
+    
+    T value;
+    while (file >> value && ar.size < listsize) {
+        MPUSH_back(ar, value);
+    }
+    file.close();
 }

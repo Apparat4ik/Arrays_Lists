@@ -22,9 +22,27 @@
 		860A23852E7FF47200AADE0D /* Arrays_Lists */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Arrays_Lists; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		86DC6BD92E951AE100A83DBB /* Exceptions for "Arrays_Lists" folder in "Compile Sources" phase from "Arrays_Lists" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 860A23812E7FF47200AADE0D /* Sources */;
+			membershipExceptions = (
+				BinaryTree.h,
+				MyArray.h,
+				MyDoubleList.h,
+				MyFList.h,
+				MyQueue.h,
+				MyStack.h,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		860A23872E7FF47200AADE0D /* Arrays_Lists */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				86DC6BD92E951AE100A83DBB /* Exceptions for "Arrays_Lists" folder in "Compile Sources" phase from "Arrays_Lists" target */,
+			);
 			path = Arrays_Lists;
 			sourceTree = "<group>";
 		};

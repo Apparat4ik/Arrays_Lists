@@ -1,7 +1,10 @@
 #pragma once
 
 #include "header.h"
-#include "MyQueue.cpp"
+#include "MyQueue.h"
+
+const string branch_right = "|--- ";
+const string branch_left = "|__ ";
 
 template<typename T>
 struct TreeNode{
@@ -16,6 +19,7 @@ struct TreeNode{
 template<typename T>
 struct FBTree{
     TreeNode<T>* root;
+    int size = 0;
     
     FBTree() : root(nullptr){}
     
@@ -29,17 +33,25 @@ struct FBTree{
     
     ~FBTree(){
         destroy_tree(root);
+        size = 0;
     }
 };
 
 template<typename T>
-bool preorder_search(const TreeNode<T>& root, T key){  // прямой обход для поиска элемента
-    if (root != nullptr){
-        if (root -> key != key){
-            pre_order(root -> left);
-            pre_order(root -> right);
-        } else {return true;}
-    }
+bool preorder_search(const TreeNode<T>* root, T key){  // прямой обход для поиска элемента
+    if (root != nullptr) {
+            if (root->key == key) {
+                return true;
+            }
+        
+            if (preorder_search(root->left, key)) {
+                return true;
+            }
+            if (preorder_search(root->right, key)) {
+                return true;
+            }
+        }
+        return false;
 }
 
 template<typename T>
@@ -53,6 +65,7 @@ void TINSERT(FBTree<T>& tree, T key){
     TreeNode<T>* newNode = new TreeNode<T>{key, nullptr, nullptr};
     if (tree.root == nullptr) {
         tree.root = newNode;
+        tree.size++;
         return;
     }
 
@@ -65,6 +78,7 @@ void TINSERT(FBTree<T>& tree, T key){
 
         if (current->left == nullptr) {
             current->left = newNode;
+            tree.size++;
             return;
         }
         else {
@@ -72,6 +86,7 @@ void TINSERT(FBTree<T>& tree, T key){
         }
         if (current->right == nullptr) {
             current->right = newNode;
+            tree.size++;
             return;
         }
         else {
@@ -81,11 +96,11 @@ void TINSERT(FBTree<T>& tree, T key){
 }
 
 template<typename T>
-bool is_fullbinary(TreeNode<T>* current){
+bool TISFULL(TreeNode<T>* current){
     if ((current -> left == nullptr) ^ (current -> right == nullptr) == 1){
         return false;
     } else if (!(current -> left == nullptr && current -> right == nullptr)){
-        return is_fullbinary(current -> left) && is_fullbinary(current -> right);
+        return TISFULL(current -> left) && TISFULL(current -> right);
     }
     return true;
     
@@ -139,7 +154,7 @@ void PRINT_postorder(FBTree<T>& tree){
 }
 
 template<typename T>
-void PRINT(const FBTree<T>& tree){    // вывод через обход в ширину (BFS)
+void PRINT_BFS(const FBTree<T>& tree){    // вывод через обход в ширину (BFS)
     if (tree.root == nullptr){
         throw out_of_range("Tree is empty");
     }
@@ -160,4 +175,64 @@ void PRINT(const FBTree<T>& tree){    // вывод через обход в ш�
         }
     }
     cout << endl;
+}
+
+template<typename T>
+void print_tree_recursive(TreeNode<T>* node, const string& prefix, bool isLeft) {
+    if (node != nullptr) {
+        cout << prefix;
+        cout << (isLeft ? branch_left : branch_right);
+        cout << node->key << endl;
+        print_tree_recursive(node->right, prefix + (isLeft ? "|   " : "    "), false);
+        print_tree_recursive(node->left, prefix + (isLeft ? "|   " : "    "), true);
+    }
+}
+
+template<typename T>
+void PRINT(TreeNode<T>* root) {
+    if (root == nullptr) {
+        cout << "Дерево пустое." << endl;
+        return;
+    }
+    cout << root->key << endl;
+
+    print_tree_recursive(root->right, "", false);
+    print_tree_recursive(root->left, "", true);
+}
+
+template<typename T>
+void pre_order_write_file(const TreeNode<T>* root, ofstream& file){
+    if (root != nullptr){
+        file << root -> key << ' ';
+        pre_order_write_file(root -> left, file);
+        pre_order_write_file(root -> right, file);
+    }
+}
+
+template<typename T>
+void tree_write_file(const FBTree<T>& tree, const string& filename){   // запись дерева в файл
+    ofstream file(filename);
+    if (file.is_open()){
+        file << tree.size << ' ';
+        pre_order_write_file(tree.root, file);
+    }
+    file.close();
+}
+
+
+template<typename T>
+void tree_read_file(FBTree<T>& tree, const string& filename){   // чтение из файла
+    tree.destroy_tree(tree.root);
+    ifstream file(filename);
+    if (is_file_empty(filename)){return;}
+    tree = FBTree<T>();
+    
+    int listsize;
+    file >> listsize;
+    for (int i = 0; i < listsize; i++) {
+        T data;
+        file >> data;
+        TINSERT(tree, data);
+    }
+    file.close();
 }

@@ -6,7 +6,7 @@ template<typename T>
 struct FLNode {
     T key;
     FLNode* next;
-    FLNode() : key(NULL), next(nullptr){}
+    FLNode() : key(T()), next(nullptr){}
     FLNode(T value, FLNode* ptr) : key(value), next(ptr){}
 };
 
@@ -18,12 +18,13 @@ struct ForwardList {
     ForwardList() : head(nullptr){}
     
     void destroy_list(FLNode<T>* head){
-        while (size != 0){
-            FLNode<T>* delNode = head;
-            head = head -> next;
-            size--;
-            delete delNode;
+        FLNode<T>* current = head;
+        while (current != nullptr) {
+            FLNode<T>* next = current->next;
+            delete current;
+            current = next;
         }
+        size = 0;
     }
     
     ~ForwardList(){
@@ -35,7 +36,7 @@ struct ForwardList {
 template<typename T>
 FLNode<T>* FGET(ForwardList<T>& fl, T key){        // O(N)
     FLNode<T>* target = fl.head;
-    while (target -> key != fl.key){
+    while (target -> key != key){
         target = target -> next;
     }
     return target;
@@ -54,19 +55,19 @@ FLNode<T>* FGET_index(ForwardList<T>& fl,int index){   // O(N)
 }
 
 template<typename T>
-void FGET_key(ForwardList<T>& fl, int index){
+T FGET_key(ForwardList<T>& fl, int index){
     try{
-        return get_index(fl, index) -> key;
-    }
-    catch(const exception& error){
+        return FGET_index(fl, index) -> key;
+    } catch(const exception& error){
         cerr << error.what() << endl;
     }
+    return NULL;
 }
 
 template<typename T>
 void FPUSH_next(ForwardList<T>& fl, int index, T key){    // O(1)
     try{
-        FLNode<T>* ptr = get_index(fl, index);
+        FLNode<T>* ptr = FGET_index(fl, index);
         FLNode<T>* newNode = new FLNode<T>;
         newNode -> key = key;
         newNode -> next = ptr -> next;
@@ -103,6 +104,11 @@ void FPUSH_front(ForwardList<T>& fl, T key){        // O(1)
 
 template<typename T>
 void FPUSH_back(ForwardList<T>& fl,T key){       // O(N)
+    if (fl.head == nullptr){
+        fl.head = new FLNode<T>{key, nullptr};
+        fl.size++;
+        return;
+    }
     FLNode<T>* ptr = fl.head;
     while(ptr -> next){
         ptr = ptr -> next;
@@ -117,7 +123,7 @@ void FPUSH_back(ForwardList<T>& fl,T key){       // O(N)
 template<typename T>
 void FDEL_next(ForwardList<T>& fl, int index){     // O(N)
     try{
-        FLNode<T>* ptr = get_index(fl, index);
+        FLNode<T>* ptr = FGET_index(fl, index);
         FLNode<T>* deleteNode = ptr -> next;
         ptr -> next = deleteNode -> next;
         delete deleteNode;
@@ -154,8 +160,9 @@ void FDEL_front(ForwardList<T>& fl){              // O(1)
 
 template<typename T>
 void FDEL_back(ForwardList<T>& fl){       // O(N)
+    
     FLNode<T>* ptr = fl.head;
-    while (ptr -> next){
+    while (ptr -> next -> next){
         ptr = ptr -> next;
     }
     FLNode<T>* deleteNode = ptr -> next;
@@ -164,7 +171,7 @@ void FDEL_back(ForwardList<T>& fl){       // O(N)
     fl.size--;
 }
 
-template<typename T>
+template<typename  T>
 void FDEL_val(ForwardList<T>& fl,T key){      // O(N)
     FLNode<T>* delNode = fl.head;
     FLNode<T>* prevNode;
@@ -187,3 +194,33 @@ void PRINT(const ForwardList<T>& fl) {
     cout << endl;
 }
 
+template<typename T>
+void flist_write_file(const ForwardList<T>& fl, const string& filename){   // запись списка в файл
+    ofstream file(filename);
+    if (file.is_open()){
+        file << fl.size << ' ';
+        FLNode<T>* current = fl.head;
+        while (current) {
+            file << current -> key << ' ';
+            current = current->next;
+        }
+    }
+    file.close();
+}
+
+template<typename T>
+void flist_read_file(ForwardList<T>& fl, const string& filename){   // чтение из файла
+    fl.destroy_list(fl.head);
+    ifstream file(filename);
+    if (is_file_empty(filename)){return;}
+    fl = ForwardList<T>();
+    
+    int listsize;
+    file >> listsize;
+    for (int i = 0; i < listsize; i++) {
+        T data;
+        file >> data;
+        FPUSH_back(fl, data);
+    }
+    file.close();
+}

@@ -8,13 +8,14 @@ struct StNode{
     T key;
     StNode* next;
     
-    StNode() : key(NULL), next(nullptr){}
+    StNode() : key(T()), next(nullptr){}
     StNode(T value, StNode* ptr) : key(value), next(ptr){}
 };
 
 template<typename T>
 struct MyStack{
     StNode<T>* head;
+    int size = 0;
     
     MyStack() : head(nullptr){}
     
@@ -38,6 +39,7 @@ void SPUSH(MyStack<T>& st, T key){
     newNode -> key = key;
     newNode -> next = st.head;
     st.head = newNode;
+    st.size++;
 }
 
 template<typename T>  // O(1)
@@ -45,6 +47,7 @@ void SPOP(MyStack<T>& st){
     StNode<T>* delNode = st.head;
     st.head = st.head -> next;
     delete delNode;
+    st.size--;
 }
 
 template<typename T>
@@ -60,4 +63,35 @@ void PRINT(const MyStack<T>& st) {
 template<typename T>   // O(1)
 T SGET_head(const MyStack<T>& st){
     return st.head -> key;
+}
+
+template<typename T>
+void stack_write_file(const MyStack<T>& st, const string& filename){   // запись стека в файл
+    ofstream file(filename);
+    if (file.is_open()){
+        file << st.size << ' ';
+        StNode<T>* current = st.head;
+        while (current) {
+            file << current -> key << ' ';
+            current = current->next;
+        }
+    }
+    file.close();
+}
+
+template<typename T>
+void stack_read_file(MyStack<T>& st, const string& filename){   // чтение из файла
+    st.destroy_stack(st.head);
+    ifstream file(filename);
+    if (is_file_empty(filename)){return;}
+    st = MyStack<T>();
+    
+    int listsize;
+    file >> listsize;
+    for (int i = 0; i < listsize; i++) {
+        T data;
+        file >> data;
+        SPUSH(st, data);
+    }
+    file.close();
 }
