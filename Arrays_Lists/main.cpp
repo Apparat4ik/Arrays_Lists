@@ -18,7 +18,7 @@ int main(){
         DoubleList<string> dl;
         MyStack<string> st;
         MyQueue<string> q;
-        FBTree<string> tree;
+        FBTree<int> tree;
         
         while(run){
             cout << "> ";
@@ -240,12 +240,12 @@ int main(){
                     
                 case Command::TISMEMBER:
                     tree_read_file(tree, filename);
-                    cout << TISMEMBER(tree, line[2]) << endl;
+                    cout << TISMEMBER(tree, stoi(line[2])) << endl;
                     break;
                     
                 case Command::TINSERT:
                     tree_read_file(tree, filename);
-                    TINSERT(tree, line[2]);
+                    TINSERT(tree, stoi(line[2]));
                     tree_write_file(tree, filename);
                     break;
                     

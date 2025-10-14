@@ -157,11 +157,20 @@ void LDEL_next(DoubleList<T>& dl, int index){     // O(1)
     try{
         DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* deleteNode = ptr -> next;
-        ptr -> next = deleteNode -> next;
-        ptr -> next -> prev = ptr;
-        delete deleteNode;
-        dl.size--;
-        size_check(dl);
+        if (deleteNode = dl.tail){
+            ptr -> next = nullptr;
+            dl.tail = ptr;
+            delete deleteNode;
+            dl.size--;
+            size_check(dl);
+            
+        } else {
+            ptr -> next = deleteNode -> next;
+            ptr -> next -> prev = ptr;
+            delete deleteNode;
+            dl.size--;
+            size_check(dl);
+        }
     } catch (exception& error){
         cerr << error.what() << endl;
     }
@@ -172,11 +181,20 @@ void LDEL_prev(DoubleList<T>& dl, int index){   //O(1)
     try{
         DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* deleteNode = ptr -> prev;
-        deleteNode -> prev -> next = ptr;
-        ptr -> prev = deleteNode -> prev;
-        dl.size--;
-        delete deleteNode;
-        size_check(dl);
+        if (deleteNode == dl.head){
+            dl.head = deleteNode -> next;
+            dl.head -> prev = nullptr;
+            delete deleteNode;
+            dl.size--;
+            size_check(dl);
+            
+        } else {
+            deleteNode -> prev -> next = ptr;
+            ptr -> prev = deleteNode -> prev;
+            dl.size--;
+            delete deleteNode;
+            size_check(dl);
+        }
     } catch (exception& error){
         cerr << error.what() << endl;
     }

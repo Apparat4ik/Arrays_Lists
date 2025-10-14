@@ -88,10 +88,18 @@ void stack_read_file(MyStack<T>& st, const string& filename){   // чтение 
     
     int listsize;
     file >> listsize;
+    
+    MyStack<T> tempStack;
     for (int i = 0; i < listsize; i++) {
         T data;
         file >> data;
-        SPUSH(st, data);
+        SPUSH(tempStack, data);
     }
+   
+    while (tempStack.head) {
+        SPUSH(st, SGET_head(tempStack));
+        SPOP(tempStack);
+    }
+       
     file.close();
 }

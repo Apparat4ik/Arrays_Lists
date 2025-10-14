@@ -69,28 +69,28 @@ void TINSERT(FBTree<T>& tree, T key){
         return;
     }
 
-    MyQueue<TreeNode<T>*> q;
-    QPUSH(q, tree.root);
+    TreeNode<T>* current = tree.root;
 
-    while (!QEMPTY(q)) {
-        TreeNode<T>* current = get_head(q);
-        QPOP(q);
-
-        if (current->left == nullptr) {
-            current->left = newNode;
-            tree.size++;
+    while (current) {
+        if (key > current->key) {
+            if (current->right != nullptr) {
+                current = current->right;
+            } else {
+                current->right = newNode;
+                tree.size++;
+                return;
+            }
+        } else if (key < current->key) {
+            if (current->left != nullptr) {
+                current = current->left;
+            } else {
+                current->left = newNode;
+                tree.size++;
+                return;
+            }
+        } else {
+            delete newNode;
             return;
-        }
-        else {
-            QPUSH(q, current->left);
-        }
-        if (current->right == nullptr) {
-            current->right = newNode;
-            tree.size++;
-            return;
-        }
-        else {
-            QPUSH(q, current->right);
         }
     }
 }
@@ -189,15 +189,15 @@ void print_tree_recursive(TreeNode<T>* node, const string& prefix, bool isLeft) 
 }
 
 template<typename T>
-void PRINT(TreeNode<T>* root) {
-    if (root == nullptr) {
-        cout << "Дерево пустое." << endl;
-        return;
-    }
+void PRINT(TreeNode<T>* root, const string& prefix = "", bool isLeft = true) {
+    if (root == nullptr) return;
+        
+    cout << prefix;
+    cout << (isLeft ? "├──" : "└──" );
     cout << root->key << endl;
-
-    print_tree_recursive(root->right, "", false);
-    print_tree_recursive(root->left, "", true);
+    
+    PRINT(root->left, prefix + (isLeft ? "│   " : "    "), true);
+    PRINT(root->right, prefix + (isLeft ? "│   " : "    "), false);
 }
 
 template<typename T>
