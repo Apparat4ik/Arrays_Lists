@@ -23,18 +23,6 @@ struct MyArray {
                data[i] = other.data[i];
            }
     }
-    /*
-    MyArray& operator=(const MyArray& other) {  // перешрузка оператора присваивания
-        if (this != &other) {
-            free(data);
-            data = (ArNode<T>*)malloc(other.capacity * sizeof(ArNode<T>));
-            size = other.size;
-            for (int i = 0; i < size; i++) {
-                data[i] = other.data[i];
-            }
-        }
-        return *this;
-    }*/
     
     MyArray(int init_cap){
         data = (ArNode<T>*)malloc(init_cap * sizeof(ArNode<T>));

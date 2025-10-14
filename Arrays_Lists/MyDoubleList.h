@@ -6,10 +6,10 @@
 template<typename T>
 struct DLNode {
     T key;
-    DLNode* left;
-    DLNode* right;
-    DLNode() : key(T()), left(nullptr), right(nullptr){}
-    DLNode(T value, DLNode* leftptr, DLNode* rightptr) : key(value), left(leftptr), right(rightptr){}
+    DLNode* prev;
+    DLNode* next;
+    DLNode() : key(T()), prev(nullptr), next(nullptr){}
+    DLNode(T value, DLNode* prevptr, DLNode* nextptr) : key(value), prev(prevptr), next(nextptr){}
 };
 
 template<typename T>
@@ -23,7 +23,7 @@ struct DoubleList {
     void destroy_list(DLNode<T>* head){
         DLNode<T>* current = head;
         while (current != nullptr) {
-            DLNode<T>* next = current->right;
+            DLNode<T>* next = current->next;
             delete current;
             current = next;
         }
@@ -39,7 +39,7 @@ struct DoubleList {
 template<typename T>
 void size_check(DoubleList<T>& dl){
     if (dl.size == 2){
-        dl.tail = dl.head -> right;
+        dl.tail = dl.head -> next;
     }
     if (dl.size == 1){
         dl.tail = dl.head;
@@ -49,8 +49,8 @@ void size_check(DoubleList<T>& dl){
 template<typename T>
 DLNode<T>* LGET(DoubleList<T>& dl, T key){        // O(N)
     DLNode<T>* target = dl.head;
-    while (target -> key != key){
-        target = target -> right;
+    while (target != nullptr && target->key != key){
+        target = target -> next;
     }
     if (target == nullptr){
         throw invalid_argument("There is no element");
@@ -65,12 +65,12 @@ DLNode<T>* LGET_index(DoubleList<T>& dl, int index){
     if (index > dl.size / 2){
         ptr = dl.tail;
         for (int i = dl.size - 1; i > index; i--){
-            ptr = ptr -> left;
+            ptr = ptr -> prev;
         }
     } else if (index <= dl.size / 2) {
         ptr = dl.head;
         for (int i = 0; i < index; i++){
-            ptr = ptr -> right;
+            ptr = ptr -> next;
         }
     } else {
         throw out_of_range("double list inex out of bouds");
@@ -90,10 +90,10 @@ void LPUSH_next(DoubleList<T>& dl, int index, T key){    // O(1)
         DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
-        newNode -> right = ptr -> right;
-        ptr -> right -> left = newNode;
-        ptr -> right = newNode;
-        newNode -> left = ptr;
+        newNode -> next = ptr -> next;
+        ptr -> next -> prev = newNode;
+        ptr -> next = newNode;
+        newNode -> prev = ptr;
         dl.size++;
         size_check(dl);
     } catch (exception& error){
@@ -107,10 +107,10 @@ void LPUSH_prev(DoubleList<T>& dl,int index, T key){   // O(1)
         DLNode<T>* ptr = LGET_index(dl, index);
         DLNode<T>* newNode = new DLNode<T>;
         newNode -> key = key;
-        newNode -> right = ptr;
-        ptr -> left -> right = newNode;
-        newNode -> left = ptr -> left;
-        ptr -> left = newNode;
+        newNode -> next = ptr;
+        ptr -> prev -> next = newNode;
+        newNode -> prev = ptr -> prev;
+        ptr -> prev = newNode;
         dl.size++;
         size_check(dl);
     } catch (exception& error){
@@ -121,10 +121,14 @@ void LPUSH_prev(DoubleList<T>& dl,int index, T key){   // O(1)
 template<typename T>
 void LPUSH_front(DoubleList<T>& dl, T key){        // O(1)
     DLNode<T>* newNode = new DLNode<T>;
-    newNode -> key = key;
-    newNode -> right = dl.head;
-    dl.head -> left = newNode;
-    newNode -> left = nullptr;
+    newNode->key = key;
+    newNode->prev = nullptr;
+    newNode->next = dl.head;
+    if (dl.head != nullptr){
+        dl.head->prev = newNode;
+    } else {
+        dl.tail = newNode;
+    }
     dl.head = newNode;
     dl.size++;
     size_check(dl);
@@ -133,16 +137,17 @@ void LPUSH_front(DoubleList<T>& dl, T key){        // O(1)
 template<typename T>
 void LPUSH_back(DoubleList<T>& dl,T key){       // O(1)
     DLNode<T>* newNode = new DLNode<T>;
+    newNode->key = key;
+    newNode->next = nullptr;
+
     if (dl.head == nullptr){
-        dl.head = newNode;
-        dl.tail = dl.head;
+        newNode->prev = nullptr;
+        dl.head = dl.tail = newNode;
+    } else {
+        newNode->prev = dl.tail;
+        dl.tail->next = newNode;
+        dl.tail = newNode;
     }
-    
-    newNode -> key = key;
-    newNode -> right = nullptr;
-    dl.tail -> right = newNode;
-    newNode -> left = dl.tail;
-    dl.tail = newNode;
     dl.size++;
     size_check(dl);
 }
@@ -151,9 +156,9 @@ template<typename T>
 void LDEL_next(DoubleList<T>& dl, int index){     // O(1)
     try{
         DLNode<T>* ptr = LGET_index(dl, index);
-        DLNode<T>* deleteNode = ptr -> right;
-        ptr -> right = deleteNode -> right;
-        ptr -> right -> left = ptr;
+        DLNode<T>* deleteNode = ptr -> next;
+        ptr -> next = deleteNode -> next;
+        ptr -> next -> prev = ptr;
         delete deleteNode;
         dl.size--;
         size_check(dl);
@@ -166,9 +171,9 @@ template<typename T>
 void LDEL_prev(DoubleList<T>& dl, int index){   //O(1)
     try{
         DLNode<T>* ptr = LGET_index(dl, index);
-        DLNode<T>* deleteNode = ptr -> left;
-        deleteNode -> left -> right = ptr;
-        ptr -> left = deleteNode -> left;
+        DLNode<T>* deleteNode = ptr -> prev;
+        deleteNode -> prev -> next = ptr;
+        ptr -> prev = deleteNode -> prev;
         dl.size--;
         delete deleteNode;
         size_check(dl);
@@ -179,9 +184,16 @@ void LDEL_prev(DoubleList<T>& dl, int index){   //O(1)
 
 template<typename T>
 void LDEL_front(DoubleList<T>& dl){              // O(1)
+    if (dl.head == nullptr) return;
     DLNode<T>* deleteNode = dl.head;
-    dl.head = dl.head -> right;
-    dl.head -> left = nullptr;
+    dl.head = dl.head -> next;
+    
+    if (dl.head != nullptr){
+        dl.head->prev = nullptr;
+    } else {
+        dl.tail = nullptr;
+    }
+    
     delete deleteNode;
     dl.size--;
     size_check(dl);
@@ -189,9 +201,18 @@ void LDEL_front(DoubleList<T>& dl){              // O(1)
 
 template<typename T>
 void LDEL_back(DoubleList<T>& dl){       // O(N)
+    if (dl.tail == nullptr) return;  // список пуст
+
     DLNode<T>* deleteNode = dl.tail;
-    dl.tail = dl.tail -> left;
-    dl.tail -> right = nullptr;
+
+    if (dl.tail->prev != nullptr){
+        dl.tail = dl.tail->prev;
+        dl.tail->next = nullptr;
+    } else {
+        dl.head = nullptr;
+        dl.tail = nullptr;
+    }
+    
     delete deleteNode;
     dl.size--;
     size_check(dl);
@@ -201,10 +222,10 @@ template<typename T>
 void LDEL_val(DoubleList<T>& dl, T key){      // O(N)
     DLNode<T>* deleteNode = dl.head;
     while (deleteNode -> key != key){
-        deleteNode = deleteNode -> right;
+        deleteNode = deleteNode -> next;
     }
-    deleteNode -> left -> right = deleteNode -> right;
-    deleteNode -> right -> left = deleteNode -> left;
+    deleteNode -> prev -> next = deleteNode -> next;
+    deleteNode -> next -> prev = deleteNode -> prev;
     delete deleteNode;
     dl.size--;
     size_check(dl);
@@ -215,7 +236,7 @@ void PRINT(const DoubleList<T>& dl) {
     DLNode<T>* ptr = dl.head;
     while (ptr) {
         cout << ptr -> key << ' ' << &(ptr -> key)<< " ";
-        ptr = ptr -> right;
+        ptr = ptr -> next;
     }
     cout << endl;
 }
@@ -225,7 +246,7 @@ void PRINT_reverse_dl(const DoubleList<T>& dl) {
     DLNode<T>* ptr = dl.tail;
     while (ptr) {
         cout << ptr -> key << " ";
-        ptr = ptr -> left;
+        ptr = ptr -> prev;
     }
     cout << endl;
 }
@@ -238,7 +259,7 @@ void dlist_write_file(const DoubleList<T>& dl, const string& filename){   // з�
         DLNode<T>* current = dl.head;
         while (current) {
             file << current -> key << ' ';
-            current = current -> right;
+            current = current -> next;
         }
     }
     file.close();
