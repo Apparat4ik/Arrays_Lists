@@ -218,7 +218,7 @@ void LDEL_front(DoubleList<T>& dl){              // O(1)
 }
 
 template<typename T>
-void LDEL_back(DoubleList<T>& dl){       // O(N)
+void LDEL_back(DoubleList<T>& dl){       // O(1)
     if (dl.tail == nullptr) return;  // список пуст
 
     DLNode<T>* deleteNode = dl.tail;

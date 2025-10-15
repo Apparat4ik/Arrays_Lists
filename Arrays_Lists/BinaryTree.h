@@ -99,7 +99,7 @@ template<typename T>
 bool TISFULL(TreeNode<T>* current){
     if ((current -> left == nullptr) ^ (current -> right == nullptr) == 1){
         return false;
-    } else if (!(current -> left == nullptr && current -> right == nullptr)){
+    } else if ((current -> left == nullptr && current -> right == nullptr)){
         return TISFULL(current -> left) && TISFULL(current -> right);
     }
     return true;

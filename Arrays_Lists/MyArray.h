@@ -16,28 +16,37 @@ struct MyArray {
     
     MyArray() : data(nullptr), size(0), capacity(0){}
     
-    MyArray(const MyArray& other) {    // конструктор для копирования массива
-           data = (ArNode<T>*)malloc(other.capacity * sizeof(ArNode<T>));
-           size = other.size;
-           for (int i = 0; i < size; i++) {
-               data[i] = other.data[i];
-           }
-    }
-    
     MyArray(int init_cap){
-        data = (ArNode<T>*)malloc(init_cap * sizeof(ArNode<T>));
+        data = new ArNode<T>[init_cap];
         capacity = init_cap;
     }
     
     ~MyArray(){
-        free(data);
+        delete[] data;
+        data = nullptr;
+        size = 0;
+        capacity = 0;
     }
 };
+
+template<typename T>
+void resize(MyArray<T>& ar){
+    int newCap = ar.size * 2;
+    ArNode<T>* newData = new ArNode<T>[newCap];
+    
+    for (int i = 0; i < ar.size; i++){
+        newData[i] = ar.data[i];
+    }
+    
+    delete[] ar.data;
+    ar.data = newData;
+    ar.capacity = newCap;
+}
 
 
 template<typename T>
 void MPUSH_back(MyArray<T>& ar, T key) {                 // O(1)
-    if (ar.size >= ar.capacity){return;}
+    if (ar.size >= ar.capacity){resize(ar);}
     ar.data[ar.size].key = key;
     ar.size++;
 }
@@ -110,9 +119,10 @@ void array_write_file(const MyArray<T>& ar, const string& filename){   // зап
 
 template<typename T>
 void array_read_file(MyArray<T>& ar, const string& filename){   // чтение из файла
-    free(ar.data);
+    delete[] ar.data;
+    ar.data = nullptr;
     ar.size = 0;
-    ar.data = (ArNode<T>*)malloc(ar.capacity * sizeof(ArNode<T>));
+    ar.data = new ArNode<T>[ar.capacity];
     ifstream file(filename);
     
     if (is_file_empty(filename)){return;}

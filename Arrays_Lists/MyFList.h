@@ -65,7 +65,7 @@ T FGET_key(ForwardList<T>& fl, int index){
 }
 
 template<typename T>
-void FPUSH_next(ForwardList<T>& fl, int index, T key){    // O(1)
+void FPUSH_next(ForwardList<T>& fl, int index, T key){    // O(n)
     try{
         FLNode<T>* ptr = FGET_index(fl, index);
         FLNode<T>* newNode = new FLNode<T>;

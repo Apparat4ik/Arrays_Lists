@@ -43,7 +43,7 @@ void SPUSH(MyStack<T>& st, T key){
 }
 
 template<typename T>  // O(1)
-void SPOP(MyStack<T>& st){
+void SPOP(MyStack<T>& st){  // вернуть удаленный узел
     StNode<T>* delNode = st.head;
     st.head = st.head -> next;
     delete delNode;

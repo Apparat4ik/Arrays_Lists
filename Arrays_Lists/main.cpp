@@ -55,7 +55,8 @@ int main(){
                     
                 case Command::MGET:
                     array_read_file(ar, filename);
-                    MGET(ar, stoi(line[2]));
+                    cout << MGET(ar, stoi(line[2])) << endl;
+                    
                     array_write_file(ar, filename);
                     break;
                     
