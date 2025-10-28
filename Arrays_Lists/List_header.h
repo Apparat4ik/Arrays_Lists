@@ -44,6 +44,11 @@ enum class Command{
     TISMEMBER,
     TINSERT,
     TISFULL,
+    
+    SETADD,
+    SETDEL,
+    SET_AT,
+    
     UNKNOWN,
 };
 
@@ -87,6 +92,11 @@ Command parseCommand(const string& cmd) {
     if (cmd == "TISMEMBER") return Command::TISMEMBER;
     if (cmd == "TINSERT") return Command::TINSERT;
     if (cmd == "TISFULL") return Command::TISFULL;
+    
+    if (cmd == "SETADD") return Command::SETADD;
+    if (cmd == "SETDEL") return Command::SETDEL;
+    if (cmd == "SET_AT") return Command::SET_AT;
+    
     return Command::UNKNOWN;
 }
 
@@ -97,6 +107,7 @@ enum class Containers{
     MYSTACK,
     MYQUEUE,
     TREE,
+    MYSET,
     UNKNOWN
 };
 
@@ -107,6 +118,7 @@ Containers parseContainer(const string& cont){
     if (cont == "MyStack") return Containers::MYSTACK;
     if (cont == "MyQueue") return Containers::MYQUEUE;
     if (cont == "FBTree") return Containers::TREE;
+    if (cont == "MySet") return Containers::MYSET;
     return Containers::UNKNOWN;
 }
 

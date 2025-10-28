@@ -1,12 +1,13 @@
 #include <sstream>
 #include <vector>
-#include "header.h"
+#include "List_header.h"
 #include "MyArray.h"
 #include "MyFList.h"
 #include "MyDoubleList.h"
 #include "MyQueue.h"
 #include "MyStack.h"
 #include "BinaryTree.h"
+#include "MySet.h"
 
 
 
@@ -19,6 +20,7 @@ int main(){
         MyStack<string> st;
         MyQueue<string> q;
         FBTree<int> tree;
+        MySet<string> mset{10};
         
         while(run){
             cout << "> ";
@@ -255,6 +257,24 @@ int main(){
                     cout << TISFULL(tree.root) << endl;
                     break;
                     
+                case Command::SETADD:
+                    mset.set_read_file(filename);
+                    mset.SETADD(line[2]);
+                    mset.set_write_file(filename);
+                    break;
+                    
+                case Command::SETDEL:
+                    mset.set_read_file(filename);
+                    mset.SETDEL(line[2]);
+                    mset.set_write_file(filename);
+                    break;
+                    
+                case Command::SET_AT:
+                    mset.set_read_file(filename);
+                    cout << mset.SET_AT(line[2]) << endl;
+                    mset.set_write_file(filename);
+                    break;
+                    
                 case Command::PRINT:
                     container = parseContainer(line[2]);
                     switch (container) {
@@ -282,6 +302,10 @@ int main(){
                             PRINT(tree.root);
                             break;
                             
+                        case Containers::MYSET:
+                            mset.SPRINT();
+                            break;
+                            
                         case Containers::UNKNOWN:
                             cerr << "Такой команды нет" << endl;
                             
@@ -302,4 +326,5 @@ int main(){
     }
     return 0;
 }
+
 

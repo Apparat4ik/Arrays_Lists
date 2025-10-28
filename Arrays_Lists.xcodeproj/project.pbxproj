@@ -32,6 +32,7 @@
 				MyDoubleList.h,
 				MyFList.h,
 				MyQueue.h,
+				MySet.h,
 				MyStack.h,
 			);
 		};

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "header.h"
+#include "List_header.h"
 
 
 template<typename T>
@@ -14,21 +14,34 @@ struct StNode{
 
 template<typename T>
 struct MyStack{
-    StNode<T>* head;
-    int size = 0;
+    StNode<T>* head = nullptr;
+    size_t size = 0;
     
     MyStack() : head(nullptr){}
     
-    void destroy_stack(StNode<T>* head){
-        while (head){
-            StNode<T>* delNode = head;
-            head = head -> next;
-            delete delNode;
+    MyStack(initializer_list<T> list) :
+        size(list.size()) {
+        for (auto item : list){
+            if (head == nullptr){
+                head = new StNode<T>(item, nullptr);
+            } else {
+                StNode<T>* newNode = new StNode{item, head};
+                head = newNode;
+            }
+        }
+    }
+    
+    void destroy_stack(){
+        StNode<T>* current = head;
+        while (current != nullptr) {
+            StNode<T>* next = current->next;
+            delete current;
+            current = next;
         }
     }
     
     ~MyStack(){
-        destroy_stack(head);
+        destroy_stack();
     }
 };
 
@@ -43,11 +56,13 @@ void SPUSH(MyStack<T>& st, T key){
 }
 
 template<typename T>  // O(1)
-void SPOP(MyStack<T>& st){  // вернуть удаленный узел
+T SPOP(MyStack<T>& st){  
     StNode<T>* delNode = st.head;
     st.head = st.head -> next;
+    T Nodekey = delNode -> key;
     delete delNode;
     st.size--;
+    return Nodekey;
 }
 
 template<typename T>
@@ -81,7 +96,7 @@ void stack_write_file(const MyStack<T>& st, const string& filename){   // зап
 
 template<typename T>
 void stack_read_file(MyStack<T>& st, const string& filename){   // чтение из файла
-    st.destroy_stack(st.head);
+    st.destroy_stack();
     ifstream file(filename);
     if (is_file_empty(filename)){return;}
     st = MyStack<T>();
