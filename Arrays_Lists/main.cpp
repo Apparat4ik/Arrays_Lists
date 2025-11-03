@@ -8,10 +8,11 @@
 #include "MyStack.h"
 #include "BinaryTree.h"
 #include "MySet.h"
+#include "TableHash.h"
 
 
 
-int main(){
+int main1(){
     try {
         bool run = true;
         MyArray<string> ar{10};
@@ -328,3 +329,18 @@ int main(){
 }
 
 
+int main(){
+    TableHash<int> tbl{10};
+    tbl.HTADD(1);
+    tbl.HTADD(2);
+    tbl.HTADD(3);
+    tbl.HTADD(4);
+    tbl.HTDEL(2);
+    tbl.HTADD(6);
+    tbl.HTADD(9);
+    tbl.HTADD(10);
+    tbl.HTADD(15);
+    tbl.HTADD(25);
+    tbl.PRINT();
+    return 0;
+}

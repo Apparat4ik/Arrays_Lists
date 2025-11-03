@@ -21,6 +21,7 @@ struct DoubleList {
     DoubleList() : head(nullptr), tail(head){}
     
     void destroy_list(DLNode<T>* head){
+        if (size == 0){return;}
         DLNode<T>* current = head;
         while (current != nullptr) {
             DLNode<T>* next = current->next;

@@ -34,6 +34,7 @@
 				MyQueue.h,
 				MySet.h,
 				MyStack.h,
+				TableHash.h,
 			);
 		};
 /* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */

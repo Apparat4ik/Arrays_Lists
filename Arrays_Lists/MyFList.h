@@ -4,20 +4,44 @@
 
 template<typename T>
 struct FLNode {
-    T key;
-    FLNode* next;
+    T key = T();
+    FLNode* next = nullptr;
     FLNode() : key(T()), next(nullptr){}
     FLNode(T value, FLNode* ptr) : key(value), next(ptr){}
 };
 
 template<typename T>
 struct ForwardList {
-    FLNode<T>* head;
+    FLNode<T>* head = nullptr;
     int size = 0;
     
     ForwardList() : head(nullptr){}
     
+    
+    ForwardList(const ForwardList& other) : head(nullptr), size(0) {
+        FLNode<T>* curr = other.head;
+        while (curr) {
+            FPUSH_back(*this, curr->key);
+            curr = curr->next;
+        }
+    }
+
+
+    ForwardList& operator=(const ForwardList& other) {
+        if (this == &other) return *this; // защита от самоприсваивания
+        destroy_list(head);
+        head = nullptr;
+        size = 0;
+        FLNode<T>* curr = other.head;
+        while (curr) {
+            FPUSH_back(*this, curr->key);
+            curr = curr->next;
+        }
+        return *this;
+    }
+
     void destroy_list(FLNode<T>* head){
+        if (size == 0){return;}
         FLNode<T>* current = head;
         while (current != nullptr) {
             FLNode<T>* next = current->next;
@@ -174,14 +198,21 @@ void FDEL_back(ForwardList<T>& fl){       // O(N)
 template<typename  T>
 void FDEL_val(ForwardList<T>& fl,T key){      // O(N)
     FLNode<T>* delNode = fl.head;
-    FLNode<T>* prevNode;
+    FLNode<T>* prevNode = fl.head;
     while (delNode -> key != key){
         prevNode = delNode;
         delNode = delNode -> next;
     }
-    prevNode -> next = delNode -> next;
-    delete delNode;
-    fl.size--;
+    if (prevNode == delNode){
+        fl.head = delNode -> next;
+        delete delNode;
+        fl.size--;
+    }
+    else {
+        prevNode -> next = delNode -> next;
+        delete delNode;
+        fl.size--;
+    }
 }
 
 template<typename T>

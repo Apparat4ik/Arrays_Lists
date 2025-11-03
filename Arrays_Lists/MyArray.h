@@ -62,7 +62,7 @@ void MPUSH_index(MyArray<T>& ar, int index, T key){        // O(N)
         throw invalid_argument("Array index out od bounds");
     }
     
-    for (int i = ar.size - 1; i >= index; i--){
+    for (int i = ar.capacity - 1; i >= index; i--){
         ar.data[i + 1] = ar.data[i];
     }
     ar.data[index].key = key;

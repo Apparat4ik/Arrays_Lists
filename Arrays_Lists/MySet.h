@@ -40,8 +40,7 @@ private:
         MyArray<T> newBuckets{buckets.capacity * 2};
         
         for (int i = 0; i < buckets.capacity; i++) {
-            hash<T> newHasher;
-            size_t newIndex = newHasher(buckets.data[i].key) % newBuckets.capacity;
+            size_t newIndex = Hash(buckets.data[i].key) % newBuckets.capacity;
             newBuckets.data[newIndex].key = buckets.data[i].key;
         }
         resize(buckets);
