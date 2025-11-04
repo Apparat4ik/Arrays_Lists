@@ -86,7 +86,7 @@ public:
         buckets.size++;
         
         if (static_cast<double>(bucketsThersSmtng) / static_cast<double>(buckets.capacity) >= 0.9){
-            rehash();
+            rehash();   
         }
     }
     

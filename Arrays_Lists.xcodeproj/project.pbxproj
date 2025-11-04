@@ -28,6 +28,7 @@
 			buildPhase = 860A23812E7FF47200AADE0D /* Sources */;
 			membershipExceptions = (
 				BinaryTree.h,
+				LRU.h,
 				MyArray.h,
 				MyDoubleList.h,
 				MyFList.h,

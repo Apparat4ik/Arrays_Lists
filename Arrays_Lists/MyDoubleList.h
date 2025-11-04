@@ -243,6 +243,21 @@ void LDEL_val(DoubleList<T>& dl, T key){      // O(N)
     while (deleteNode -> key != key){
         deleteNode = deleteNode -> next;
     }
+    if (deleteNode == dl.head){
+        dl.head = deleteNode -> next;
+        delete deleteNode;
+        dl.size--;
+        size_check(dl);
+        return;
+        
+    } else if (deleteNode == dl.tail){
+        deleteNode -> prev -> next = nullptr;
+        delete deleteNode;
+        dl.size--;
+        size_check(dl);
+        return;
+    }
+    
     deleteNode -> prev -> next = deleteNode -> next;
     deleteNode -> next -> prev = deleteNode -> prev;
     delete deleteNode;
@@ -254,7 +269,7 @@ template<typename T>
 void PRINT(const DoubleList<T>& dl) {
     DLNode<T>* ptr = dl.head;
     while (ptr) {
-        cout << ptr -> key << ' ' << &(ptr -> key)<< " ";
+        cout << ptr -> key << ' ';
         ptr = ptr -> next;
     }
     cout << endl;

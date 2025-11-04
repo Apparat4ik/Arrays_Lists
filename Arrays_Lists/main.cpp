@@ -9,6 +9,7 @@
 #include "BinaryTree.h"
 #include "MySet.h"
 #include "TableHash.h"
+#include "LRU.h"
 
 
 
@@ -330,17 +331,13 @@ int main1(){
 
 
 int main(){
-    TableHash<int> tbl{10};
-    tbl.HTADD(1);
-    tbl.HTADD(2);
-    tbl.HTADD(3);
-    tbl.HTADD(4);
-    tbl.HTDEL(2);
-    tbl.HTADD(6);
-    tbl.HTADD(9);
-    tbl.HTADD(10);
-    tbl.HTADD(15);
-    tbl.HTADD(25);
-    tbl.PRINT();
+    LRU<int> Cash{2};
+    Cash.SET(1, 2);
+    Cash.SET(2, 3);
+    Cash.SET(3, 5);
+    Cash.SET(4, 4);
+    Cash.SET(6, 9);
+    cout << Cash.GET(6) << endl;
+    Cash.PRINT();
     return 0;
 }
