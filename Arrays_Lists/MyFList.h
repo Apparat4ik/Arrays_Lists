@@ -85,7 +85,7 @@ T FGET_key(ForwardList<T>& fl, int index){
     } catch(const exception& error){
         cerr << error.what() << endl;
     }
-    return NULL;
+    return T();
 }
 
 template<typename T>
@@ -199,7 +199,7 @@ template<typename  T>
 void FDEL_val(ForwardList<T>& fl,T key){      // O(N)
     FLNode<T>* delNode = fl.head;
     FLNode<T>* prevNode = fl.head;
-    while (delNode -> key != key){
+    while (delNode -> key  != key){
         prevNode = delNode;
         delNode = delNode -> next;
     }

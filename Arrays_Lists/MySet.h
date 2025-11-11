@@ -1,137 +1,48 @@
 #pragma once
 
-#include "List_header.h"
-#include "MyArray.h"
+#include "OpenTable.h"
 
+template<typename Key, typename Value>
+ostream& operator<<(ostream& os, OTNode<Key, Value> s){
+    os << s.key;
+    return os;
+}
 
 template<typename T>
 class MySet{
 private:
-    MyArray<T> buckets;
-    size_t countItems = 0;
-    
-    size_t Hash(int key) const {
-        size_t hash = 0;
-        while (key > 0) {
-            hash ^= (key & 0xFF); // берём младший байт и XOR с хэшем
-            key >>= 8;            // сдвигаем на байт вправо
-        }
-        return hash % buckets.size;
-    }
-    
-    size_t Hash(const string& s) const {
-        size_t sum = 0;
-        for (unsigned char c : s){
-            sum += c;
-        }
-        return sum % buckets.size;
-    }
-    
-    size_t get_bucket_index(const T& key) const {
-        return Hash(key) % buckets.capacity;
-    }
-    
-    void rehash() {
-        MyArray<T> newBuckets{buckets.capacity * 2};
-        
-        for (int i = 0; i < buckets.capacity; i++) {
-            size_t newIndex = Hash(buckets.data[i].key) % newBuckets.capacity;
-            newBuckets.data[newIndex].key = buckets.data[i].key;
-        }
-        resize(buckets);
-        for (int i = 0; i < buckets.capacity; i++){
-            MSWAP(buckets, i, newBuckets.data[i].key);
-        }
-        }
+    OpenTable<T, bool> buckets;
+    int itemcnt = 0;
     
 public:
-    MySet(int initcap) : buckets(MyArray<T>(initcap)) {};
-    MySet() : buckets(MyArray<T>(10)) {};
+    MySet(int initcap) : buckets(OpenTable<T, bool>(initcap)) {};
+    MySet() : buckets(OpenTable<T, bool>(10)) {};
     
     bool SET_AT(const T& key) const {
-        if (buckets.size == 0) return false;
-        
-        size_t index = get_bucket_index(key);
-        
-        if (buckets.data[index].key == key) return true;
-
-        return false;
+        return buckets.find(key);
     }
     
     void SETADD(const T& key) {
-        if (SET_AT(key)) {
-            return;
-        }
-        
-        size_t index = get_bucket_index(key);
-        if (buckets.data[index].key != T()) {
-            rehash();
-            index = get_bucket_index(key);
-            MPUSH_index(buckets, index, key);
-            countItems++;
-            return;
-        }
-        
-        MPUSH_index(buckets, index, key);
-        countItems++;
+        buckets.insert(key, 0);
+        itemcnt++;
     }
     
     void SETDEL(const T& key) {
-        if (buckets.size == 0) return;
-        
-        size_t index = get_bucket_index(key);
-    
-        if (buckets.data[index].key == key){
-            MDEL(buckets, index);
-            countItems--;
-        }
-    }
-    
-    
-    bool SET_AT_XY(const T& key) const {
-        if (buckets.size == 0) return false;
-        
-        size_t index = get_bucket_index(key);
-        
-        if (buckets.data[index].key != T()) return true;
-
-        return false;
-    }
-    
-    void SETADD_XY(const T& key, const T& value){
-        if (SET_AT(key)) {
-            return;
-        }
-        
-        size_t index = get_bucket_index(key);
-        if (buckets.data[index].key != T()) {
-            rehash();
-            index = get_bucket_index(key);
-            MPUSH_index(buckets, index, value);
-            countItems++;
-            return;
-        }
-        
-        MPUSH_index(buckets, index, value);
-        countItems++;
-    }
-    
-    T SET_GET_XY(const T& key){
-        size_t index = get_bucket_index(key);
-        return buckets.data[index].key;
+        buckets.erase(key);
+        itemcnt--;
     }
     
     
     size_t size() const {
-        return countItems;
+        return itemcnt;
     }
     
     bool empty() const {
-        return countItems == 0;
+        return itemcnt == 0;
     }
     
     void SPRINT(){
-        PRINT(buckets);
+        buckets.SPRINT();
     }
     
     void set_write_file(const string& filename) const {
@@ -141,10 +52,10 @@ public:
         }
         
 
-        file << buckets.capacity << ' ' << countItems << ' ' << endl;
+        file << buckets.get_cap() << ' ' << itemcnt << ' ' << endl;
 
-        for (int i = 0; i < buckets.capacity; i++){
-            file << buckets.data[i].key << ' ';
+        for (int i = 0; i < buckets.get_cap(); i++){
+            file << buckets.get_key(i) << ' ';
         }
 
         file.close();
@@ -152,13 +63,17 @@ public:
     
     void set_read_file(const string& filename){
         ifstream file(filename);
-       if (!file.is_open()) {
-           return;
-       }
+        if (!file.is_open()) {
+            return;
+        }
+        if (is_file_empty(filename)){return;}
         
         int sz, count;
         file >> sz >> count;
-
+        
+        buckets = OpenTable<T, bool>(sz);
+        itemcnt = 0;
+        
         T value;
         while (file >> value) {
             SETADD(value);

@@ -14,7 +14,28 @@ struct MyArray {
     int size;
     int capacity;
     
-    MyArray() : data(nullptr), size(0), capacity(5){}
+    MyArray() : data(new ArNode<T>[5]), size(0), capacity(5){}
+    
+    MyArray(const MyArray& other) {
+        capacity = other.capacity;
+        size = other.size;
+        data = new ArNode<T>[capacity];
+        for (int i = 0; i < size; i++) {
+            data[i] = other.data[i];
+        }
+    }
+
+    MyArray& operator=(const MyArray& other) {
+        if (this == &other) return *this;
+        delete[] data;
+        capacity = other.capacity;
+        size = other.size;
+        data = new ArNode<T>[capacity];
+        for (int i = 0; i < size; i++) {
+            data[i] = other.data[i];
+        }
+        return *this;
+    }
     
     MyArray(int init_cap){
         data = new ArNode<T>[init_cap];
@@ -38,14 +59,16 @@ void resize(MyArray<T>& ar){
     
     // Копируем только если есть что копировать
     if (ar.size > 0) {
-        for (int i = 0; i < ar.size; i++){
+        for (int i = 0; i < ar.capacity; i++){
             newData[i] = ar.data[i];
         }
     }
     
-    delete[] ar.data;
+    if (!(ar.data == nullptr)){
+        delete[] ar.data;
+    }
     ar.data = newData;
-    ar.capacity = newCap;  // capacity всегда обновляется
+    ar.capacity = newCap;  
 }
 
 
@@ -126,8 +149,7 @@ template<typename T>
 void array_read_file(MyArray<T>& ar, const string& filename){   // чтение из файла
     delete[] ar.data;
     ar.data = nullptr;
-    ar.size = 0;
-    ar.data = new ArNode<T>[ar.capacity];
+    
     ifstream file(filename);
     
     if (is_file_empty(filename)){return;}
@@ -135,8 +157,11 @@ void array_read_file(MyArray<T>& ar, const string& filename){   // чтение 
     int listsize;
     file >> listsize;
     
+    ar.size = 0;
+    ar.data = new ArNode<T>[ar.capacity];
+    
     T value;
-    while (file >> value && ar.capacity < listsize) {
+    while (file >> value && ar.size < listsize) {
         MPUSH_back(ar, value);
     }
     file.close();

@@ -2,52 +2,60 @@
 
 #include "List_header.h"
 #include "MyDoubleList.h"
-#include "MySet.h"
+#include "TableHash.h"
 
 
 
 template<typename T>
 class LRU{
 private:
-    MySet<T> table;
-    DoubleList<T> cash;
+    TableHash<T> table;
+    DoubleList<HashNode<T>> cash;
     int capacity;
     
 public:
     LRU(int cap) : capacity(cap){}
     
     T GET(T key){
-        if (!table.SET_AT_XY(key)){
+        if (!table.HT_AT(key)){
             return -1;
         }
-        T value = table.SET_GET_XY(key);
-        LDEL_val(cash, value);
-        LPUSH_front(cash, value);
+        T value = table.GET(key);
+        HashNode<T> nd{key, value};
+        LDEL_val(cash, nd);
+        LPUSH_front(cash, nd);
         return value;
     }
     
     void SET(const T& key, const T& value){
-        if (table.SET_AT_XY(key)){
+        if (table.HT_AT(key)){
             
-            T oldElement = table.SET_GET_XY(key);
+            T oldElement = table.GET(key);
             
-            table.SETDEL(key);
-            table.SETADD_XY(key, value);
+            table.HTDEL(key);
+            table.HTADD(key, value);
             
-            LDEL_val(cash, oldElement);
-            LPUSH_front(cash, value);
+            HashNode<T> old_node{key, oldElement};
+            HashNode<T> nd{key, value};
+            
+            LDEL_val(cash, old_node);
+            LPUSH_front(cash, nd);
             return;
         }
         
         if (cash.size >= capacity){
+            
+            HashNode<T> nd{key, value};
+            table.HTDEL((cash.tail -> key).key);
             LDEL_back(cash);
-            LPUSH_front(cash, value);
-            table.SETADD_XY(key, value);
+            LPUSH_front(cash, nd);
+            table.HTADD(key, value);
+            
             return;
         }
-        
-        LPUSH_front(cash, value);
-        table.SETADD_XY(key, value);
+        HashNode<T> nd{key, value};
+        LPUSH_front(cash, nd);
+        table.HTADD(key, value);
     }
     
     void PRINT(){

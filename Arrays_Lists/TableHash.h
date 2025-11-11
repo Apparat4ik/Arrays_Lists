@@ -3,35 +3,58 @@
 #include "List_header.h"
 #include "MyArray.h"
 #include "MyFList.h"
+#include <sstream>
 
+
+template<typename T>
+struct HashNode{
+    T key;
+    T value;
+    HashNode(T k, T v) : key(k), value(v){}
+    HashNode() = default;
+    
+    bool operator==(const HashNode& other) const {
+        return (key == other.key && value == other.value);
+    }
+};
+
+template<typename T>
+ostream& operator<<(ostream& os,HashNode<T> hn){
+    os << hn.key << ' ' << hn.value << "  ";
+    return os;
+}
 
 template<typename T>
 class TableHash{
 private:
-    MyArray<ForwardList<T>> buckets;
+    MyArray<ForwardList<HashNode<T>>> buckets;
     size_t countItems = 0;
     size_t bucketsThersSmtng = 0;
     const double loadFactor = 0.75;
     
-    size_t Hash(const int& x) const {
-        size_t h = static_cast<size_t>(x);
-        h ^= (h >> 16);
-        h *= 0x45d9f3b;
-        h ^= (h >> 16);
-        h *= 0x45d9f3b;
-        h ^= (h >> 16);
-        return h;
+    size_t Hash(int key) const {
+        size_t hash = 0;
+        while (key > 0) {
+            hash ^= (key & 0xFF); // берём младший байт и XOR с хэшем
+            key >>= 8;            // сдвигаем на байт вправо
+        }
+        return hash % buckets.capacity;
     }
     
-    size_t Hash(const string& s) const {
-        size_t h = 0x9e3779b97f4a7c15ULL; // число из золотого сечения
-        const size_t prime = 0x100000001b3ULL; // простое число (FNV prime)
-
-        for (unsigned char c : s) {
-            h ^= static_cast<size_t>(c) + 0x9e3779b9 + (h << 6) + (h >> 2);
-            h *= prime;
+    size_t Hash(const string& key) const {
+        size_t sum = 0;
+        for (char c : key) {
+            sum += static_cast<uint8_t>(c);
         }
-        return h;
+
+        uint32_t result = (sum % (buckets.capacity - 1)) + 1;
+
+        //Делаем результат нечётным, если размер таблицы чётный
+        if (buckets.capacity % 2 == 0 && result % 2 == 0) {
+            result++;
+        }
+
+        return result;
     }
     
     size_t get_bucket_index(const T& key) const {
@@ -39,12 +62,12 @@ private:
     }
     
     void rehash() {
-        MyArray<ForwardList<T>> newBuckets{buckets.capacity * 2};
+        MyArray<ForwardList<HashNode<T>>> newBuckets{buckets.capacity * 2};
         
         for (int i = 0; i < buckets.capacity; i++) {
             for (int j = 0; j < buckets.data[i].key.size; j++){
-                T element = FGET_key(buckets.data[i].key, j);
-                size_t newIndex = Hash(element) % newBuckets.capacity;
+                HashNode<T> element = FGET_key(buckets.data[i].key, j);
+                size_t newIndex = Hash(element.key) % newBuckets.capacity;
                 FPUSH_back(newBuckets.data[newIndex].key, element);
             }
         }
@@ -55,21 +78,21 @@ private:
     }
     
 public:
-    TableHash(int initcap) : buckets(MyArray<ForwardList<T>>(initcap)) {};
-    TableHash() : buckets(MyArray<ForwardList<T>>(10)) {};
+    TableHash(int initcap) : buckets(MyArray<ForwardList<HashNode<T>>>(initcap)) {};
+    TableHash() : buckets(MyArray<ForwardList<HashNode<T>>>(10)) {};
     
     bool HT_AT(const T& key) const {
         if (buckets.size == 0) return false;
         
         size_t index = get_bucket_index(key);
         for (int i = 0; i < buckets.data[index].key.size; i++){
-            if (FGET_key(buckets.data[index].key, i) == key){return true;}
+            if (FGET_key(buckets.data[index].key, i).key == key){return true;}
         }
 
         return false;
     }
     
-    void HTADD(const T& key) {
+    void HTADD(const T& key, const T& value) {
         if (HT_AT(key)) {
             return;
         }
@@ -81,7 +104,9 @@ public:
         int index = get_bucket_index(key);
         
         if (buckets.data[index].key.size == 0){bucketsThersSmtng++;}
-        FPUSH_back(buckets.data[index].key, key);
+        
+        HashNode<T> node{key, value};
+        FPUSH_back(buckets.data[index].key, node);
         countItems++;
         buckets.size++;
         
@@ -90,14 +115,37 @@ public:
         }
     }
     
+    T GET(const T& key){
+        size_t index = get_bucket_index(key);
+        for (int i = 0; i < buckets.data[index].key.size; i++) {
+            HashNode<T> element = FGET_key(buckets.data[index].key, i);
+            if (element.key == key) {
+                return element.value;
+            }
+        }
+        return T();
+    }
+    
     void HTDEL(const T& key) {
-        if (buckets.size == 0) return;
+        if (countItems == 0) return;
         
         size_t index = get_bucket_index(key);
         if (buckets.data[index].key.size == 0) {return;}
         if (buckets.data[index].key.size == 1) {bucketsThersSmtng--;}
-
-        FDEL_val(buckets.data[index].key, key);
+        
+        T val = T();
+        
+        for (int i = 0; i < buckets.data[index].key.size; i++) {
+            HashNode<T> element = FGET_key(buckets.data[index].key, i);
+            if (element.key == key) {
+                val = element.value;
+            }
+        }
+        if (val == T()){
+            return;
+        }
+        HashNode<T> nd{key, val};
+        FDEL_val(buckets.data[index].key, nd);
     }
     
     

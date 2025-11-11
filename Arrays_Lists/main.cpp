@@ -13,7 +13,7 @@
 
 
 
-int main1(){
+int main(){
     try {
         bool run = true;
         MyArray<string> ar{10};
@@ -330,14 +330,24 @@ int main1(){
 }
 
 
-int main(){
-    LRU<int> Cash{2};
-    Cash.SET(1, 2);
-    Cash.SET(2, 3);
-    Cash.SET(3, 5);
-    Cash.SET(4, 4);
-    Cash.SET(6, 9);
-    cout << Cash.GET(6) << endl;
-    Cash.PRINT();
+int mainchech(){
+    LRU<int> cash{2};
+    cash.SET(1, 2);
+    cash.SET(3, 6);
+    cash.SET(2, 7);
+    
+    cout << cash.GET(1) << endl;
+    cash.PRINT();
+    
+    /*
+    TableHash<int> tb;
+    tb.HTADD(1, 2);
+    tb.HTADD(2, 4);
+    tb.HTADD(5, 7);
+    tb.HTADD(10, 5);
+    tb.HTDEL(10);
+    tb.PRINT();
+     */
     return 0;
 }
+
